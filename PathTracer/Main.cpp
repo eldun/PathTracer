@@ -7,7 +7,7 @@ The code for this path tracer is based on "Ray Tracing in One Weekend" by Peter 
 *****************************************************************************************/
 
 /* 
-* Color any pixel red that hits a small sphere at -1 on the z-axis. 
+* Check to see if a ray hits a sphere with center at *center* and radius *radius*. 
 *
 * Equation of sphere in vector form : dot((p-c, (p-c)) = R^2 
 * where p is a point on the ray, c is the center of the sphere, and R is the radius of the sphere.
@@ -24,26 +24,39 @@ The code for this path tracer is based on "Ray Tracing in One Weekend" by Peter 
 * in a square root that is positive(two solutions), negative(no solutions), or zero(1 solution). See Quadratic.png for a visual.
 * I haven't done geometry in a while.
 */
-bool hit_sphere(const vec3& center, double radius, const ray& r) {
+float hit_sphere(const vec3& center, double radius, const ray& r) {
 	vec3 oc = r.origin() - center;
 	double a = dot(r.direction(), r.direction());
 	double b = 2.0 * dot(oc, r.direction());
 	double c = dot(oc, oc) - radius * radius;
-	double discriminant = b*b - 4*a*c;
-	return (discriminant > 0);
+	double discriminant = (b*b) - (4*a*c);
+	if (discriminant < 0) {
+		return -1.0;
+	}
+	else {
+		return (-b - sqrt(discriminant)) / (2.0 * a);
+	}
 }
 
 /*
+* Assign colors to pixels
+*
+* Background -
 * Linearly blends white and blue depending on the value of y coordinate (Linear Blend/Linear Interpolation/lerp).
 * Lerps are always of the form: blended_value = (1-t)*start_value + t*end_value.
 * t = 0.0 = White
 * t = 1.0 = Blue
+* 
+* Draw sphere and surface normals
 */
 vec3 color(const ray& r) {
-	if (hit_sphere(vec3(0, 0, -1), 0.5, r))
-		return vec3(1, 0, 0);
+	double t = hit_sphere(vec3(0, 0, -1), 0.5, r); // does the ray hit the values of a sphere placed at (0,0,-1) with a radius of .5?
+	if (t > 0.0) { // sphere hit
+		vec3 N = unit_vector(r.point_at_parameter(t) - vec3(0, 0, -1)); // N (the normal) is calculated (see SurfaceNormal.png)
+		return 0.5 * (vec3(N.x() + 1, N.y() + 1, N.z() + 1)); // RGB values assigned based on xyz values
+	}
 	vec3 unit_direction = unit_vector(r.direction());
-	double t = 0.5 * (unit_direction.y() + 1.0);
+	t = 0.5 * (unit_direction.y() + 1.0);
 	return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
 
 }
