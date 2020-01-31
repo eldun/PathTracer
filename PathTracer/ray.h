@@ -1,6 +1,6 @@
 #ifndef RAYH
 #define RAYH
-#include "Vec3.h"
+#include "vec3.h"
 
 /*******************************************************************************
 * All ray tracers have a ray class, along with what color is seen along a ray.
