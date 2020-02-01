@@ -1,7 +1,8 @@
 #include <iostream>
 #include "sphere.h"
 #include "hittableList.h"
-#include "float.h"
+#include "camera.h"
+#include "random.h"
 
 /****************************************************************************************
 The code for this path tracer is based on "Ray Tracing in One Weekend" by Peter Shirley. 
@@ -22,7 +23,7 @@ The code for this path tracer is based on "Ray Tracing in One Weekend" by Peter 
 */
 vec3 color(const ray& r, hittable * world) {
 	hit_record rec;
-	if (world->hit(r, 0.0, DBL_MAX, rec)) {
+	if (world->hit(r, 0.0, TMP_MAX, rec)) {
 		return 0.5 * vec3(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1); // return a vector with values between 0 and 1 (based on xyz) to be converted to rgb values
 	}
 	else { // background
@@ -33,33 +34,31 @@ vec3 color(const ray& r, hittable * world) {
 }
 
 int main() {
+
 	int nx = 200; // Number of horizontal pixels
 	int ny = 100; // Number of vertical pixels
+	int ns = 100; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n"; // P3 signifies ASCII, 255 signifies max color value
-
-	// The values below are derived from making the "camera"/ray origin coordinates (0, 0, 0) relative to the canvas. 
-	// See the included file "TracingIllustration.png" for a visual representation.
-	vec3 lower_left_corner(-2.0, -1.0, -1.0);
-	vec3 horizontal(4.0, 0.0, 0.0);
-	vec3 vertical(0.0, 2.0, 0.0);
-	vec3 origin(0.0, 0.0, 0.0);
 
 	// Create spheres
 	hittable *list[2];
 	list[0] = new sphere(vec3(0, 0, -1), 0.5);
 	list[1] = new sphere(vec3(0, -100.5, -1), 100);
 	hittable* world = new hittable_list(list, 2);
+	camera cam;
 
-	for (int j = ny - 1; j >= 0; j--) { // RGB triplets
+	for (int j = ny - 1; j >= 0; j--) { // Navigate canvas
 		for (int i = 0; i < nx; i++) {
-			double u = double(i) / double(nx);
-			double v = double(j) / double(ny);
+			vec3 col(0, 0, 0);
+			for (int s = 0; s < ns; s++) { // Anti-aliasing - get ns samples for each pixel
+				double u = (i + random_double(0.0, 0.999)) / double(nx);
+				double v = (j + random_double(0.0, 0.999)) / double(ny);
+				ray r = cam.get_ray(u, v);
+				vec3 p = r.point_at_parameter(2.0);
+				col += color(r, world);
+			}
 
-			// Approximate pixel centers on the canvas for each ray r
-			ray r(origin, lower_left_corner + u * horizontal + v * vertical);
-
-			vec3 p = r.point_at_parameter(2.0);
-			vec3 col = color(r, world);
+			col /= double(ns); // Average the color between objects/background
 			int ir = int(255.99 * col[0]);
 			int ig = int(255.99 * col[1]);
 			int ib = int(255.99 * col[2]);
