@@ -9,6 +9,16 @@ The code for this path tracer is based on "Ray Tracing in One Weekend" by Peter 
 				https://github.com/RayTracing/raytracing.github.io
 *****************************************************************************************/
 
+/*
+* Rejection method to determine a random coordinate in the sphere
+*/
+vec3 random_unit_sphere_coordinate() {
+	vec3 p;
+	do { // pick random point in xyz from -1 to 1 until a point is in the sphere
+		p = 2.0 * vec3(random_double(0.0, 0.999), random_double(0.0, 0.999), random_double(0.0, 0.999)) - vec3(1, 1, 1);
+	} while (p.squared_length() >= 1.0);
+	return p;
+}
 
 /*
 * Assign colors to pixels
@@ -23,8 +33,11 @@ The code for this path tracer is based on "Ray Tracing in One Weekend" by Peter 
 */
 vec3 color(const ray& r, hittable * world) {
 	hit_record rec;
+	// Light that reflects off a diffuse surface has its direction randomized (See DiffuseMaterials.png).
+	// Light may also be absorbed.
 	if (world->hit(r, 0.0, TMP_MAX, rec)) {
-		return 0.5 * vec3(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1); // return a vector with values between 0 and 1 (based on xyz) to be converted to rgb values
+		vec3 target = rec.p + rec.normal + random_unit_sphere_coordinate(); // See DiffuseAbsorption.png for visualization. 
+		return 0.5 * color(ray(rec.p, target - rec.p), world); // light is absorbed continually by the sphere or reflected into the world.
 	}
 	else { // background
 		vec3 unit_direction = unit_vector(r.direction());
@@ -37,7 +50,7 @@ int main() {
 
 	int nx = 200; // Number of horizontal pixels
 	int ny = 100; // Number of vertical pixels
-	int ns = 100; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
+	int ns = 10; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n"; // P3 signifies ASCII, 255 signifies max color value
 
 	// Create spheres
@@ -59,6 +72,7 @@ int main() {
 			}
 
 			col /= double(ns); // Average the color between objects/background
+			col = vec3(sqrt(col[0]), sqrt(col[1]), sqrt(col[2]));  // set gamma to 2
 			int ir = int(255.99 * col[0]);
 			int ig = int(255.99 * col[1]);
 			int ib = int(255.99 * col[2]);
