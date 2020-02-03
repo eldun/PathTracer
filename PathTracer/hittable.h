@@ -3,11 +3,13 @@
 
 #include "ray.h"
 
+class material; // forward declaration
 
 struct hit_record {
-	double t;
-	vec3 p;
+	double t; // parameter of the ray that locates the intersection point
+	vec3 p; // intersection point
 	vec3 normal;
+	material* material_ptr;
 };
 
 /* 

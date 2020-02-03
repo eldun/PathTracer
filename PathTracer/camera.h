@@ -1,7 +1,20 @@
 #ifndef CAMERAH
 #define CAMERAH
 
+#include "random.h"
 #include "ray.h"
+
+/*
+* Rejection method to determine a random coordinate in the unit sphere
+* See RejectionSampling.png for a vizualization. This finds the random point S shown in Diffuse.png.
+*/
+vec3 random_unit_sphere_coordinate() {
+	vec3 p;
+	do {
+		p = 2.0 * vec3(random_double(0.0, 0.999), random_double(0.0, 0.999), random_double(0.0, 0.999)) - vec3(1, 1, 1);
+	} while (p.squared_length() >= 1.0);
+	return p;
+}
 
 class camera {
 public:
