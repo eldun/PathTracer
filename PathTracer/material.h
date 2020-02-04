@@ -33,17 +33,21 @@ class lambertian : public material {
 };
 
 // Simulate reflection of a metal (see MetalReflectivity.png)
+// See FuzzyReflections.png for a visualization of fuzziness.
 class metal : public material {
     public:
-        metal(const vec3& a) : albedo(a) {}
+        metal(const vec3& a, double f) : albedo(a) {
+            if (f<1) fuzz = f; else fuzz = 1; // max fuzz of 1, for now.
+        }
         virtual bool scatter(const ray& ray_in, const hit_record& rec, vec3& attenuation, ray& scattered) const {
         vec3 reflected = reflect(unit_vector(ray_in.direction()), rec.normal);
-        scattered = ray(rec.p, reflected);
+        scattered = ray(rec.p, reflected + fuzz*random_unit_sphere_coordinate()); // large spheres or grazing rays may go below the surface. In that case, they'll just be absorbed.
         attenuation = albedo;
         return dot(scattered.direction(), rec.normal) > 0.0;
     }
 
     vec3 albedo;
+    double fuzz;
 };
 
 

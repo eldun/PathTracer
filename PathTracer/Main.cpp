@@ -49,8 +49,8 @@ vec3 color(const ray& r, hittable *world, int depth) {
 
 int main() {
 
-	int nx = 200; // Number of horizontal pixels
-	int ny = 100; // Number of vertical pixels
+	int nx = 600; // Number of horizontal pixels
+	int ny = 300; // Number of vertical pixels
 	int ns = 100; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n"; // P3 signifies ASCII, 255 signifies max color value
 
@@ -58,8 +58,8 @@ int main() {
 	hittable *list[4];
     list[0] = new sphere(vec3(0,0,-1), 0.5, new lambertian(vec3(0.8, 0.3, 0.3)));
     list[1] = new sphere(vec3(0,-100.5,-1), 100, new lambertian(vec3(0.8, 0.8, 0.0)));
-    list[2] = new sphere(vec3(1,0,-1), 0.5, new metal(vec3(0.8, 0.6, 0.2)));
-    list[3] = new sphere(vec3(-1,0,-1), 0.5, new metal(vec3(0.8, 0.8, 0.8)));
+    list[2] = new sphere(vec3(1,0,-1), 0.5, new metal(vec3(0.8, 0.6, 0.2), 0.0));
+    list[3] = new sphere(vec3(-1,0,-1), 0.5, new metal(vec3(0.8, 0.8, 0.8), 1.0));
     hittable *world = new hittable_list(list,4);
 	camera cam;
 
