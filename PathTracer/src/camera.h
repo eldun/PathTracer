@@ -18,22 +18,30 @@ vec3 random_unit_sphere_coordinate() {
 
 class camera {
     public:
-        camera(double vFov, double aspectRatio) { // vFov is in degrees
-            double theta = vFov*M_PI/180; // convert vertical Fov to radians
+        camera(vec3 lookFrom, vec3 lookAt, vec3 vUp, double vFov, double aspectRatio) { // vFov is in degrees
+            vec3 u, v, w;
+            
+			double theta = vFov*M_PI/180; // Convert vertical Fov to radians
 
 			// See CameraModelSummary.png for visualization
             double half_height = tan(theta/2);
             double half_width = aspectRatio * half_height;
 
-            lower_left_corner = vec3(-half_width, -half_height, -1.0);
-            horizontal = vec3(2*half_width, 0.0, 0.0);
-            vertical = vec3(0.0, 2*half_height, 0.0);
-            origin = vec3(0.0, 0.0, 0.0);
+			// See OrthagonalView.png and OrthangonalBasis.png for a visualization
+			// of translating the perspective of the original camera using cross products
+			// and specifying which direction is up with vUp.
+            origin = lookFrom;
+            w = unit_vector(lookFrom - lookAt);
+            u = unit_vector(cross(vUp, w));
+            v = cross(w, u);
+            lower_left_corner = origin - half_width*u - half_height*v - w;
+            horizontal = 2*half_width*u;
+            vertical = 2*half_height*v;
         }
 
-        ray get_ray(double u, double v) {
+        ray get_ray(double s, double t) {
             return ray(origin,
-                       lower_left_corner + u*horizontal + v*vertical - origin);
+                       lower_left_corner + s*horizontal + t*vertical - origin);
         }
 
         vec3 origin;
