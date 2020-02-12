@@ -49,20 +49,18 @@ vec3 color(const ray& r, hittable *world, int depth) {
 
 int main() {
 
-	int nx = 150; // Number of horizontal pixels
-	int ny = 75; // Number of vertical pixels
-	int ns = 100; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
+	int nx = 400; // Number of horizontal pixels
+	int ny = 200; // Number of vertical pixels
+	int ns = 15; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n"; // P3 signifies ASCII, 255 signifies max color value
 
 	// Create spheres
-	hittable *list[5];
-    list[0] = new sphere(vec3(0,0,-1), 0.5, new lambertian(vec3(0.1, 0.2, 0.5)));
-    list[1] = new sphere(vec3(0,-100.5,-1), 100, new lambertian(vec3(0.8, 0.8, 0.0)));
-    list[2] = new sphere(vec3(1,0,-1), 0.5, new metal(vec3(0.8, 0.6, 0.2), 0.0));
-    list[3] = new sphere(vec3(-1,0,-1), 0.5, new dielectric(vec3(0.1, 0.2, 0.5), 1.5));
-	list[4] = new sphere(vec3(-1,.5,-2), -0.45, new dielectric(vec3(0.1, 0.2, 0.2), 1.5));
-    hittable *world = new hittable_list(list,5);
-	camera cam;
+	hittable *list[2];
+	float R = cos(M_PI/4);
+	list[0] = new sphere(vec3(-R,0,-1), R, new lambertian(vec3(0, 0, 1)));
+	list[1] = new sphere(vec3( R,0,-1), R, new lambertian(vec3(1, 0, 0)));
+	hittable *world = new hittable_list(list,2);;
+	camera cam(90, double(nx) / double(ny));
 
 	for (int j = ny - 1; j >= 0; j--) { // Navigate canvas
 		for (int i = 0; i < nx; i++) {
