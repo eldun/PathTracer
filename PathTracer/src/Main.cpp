@@ -42,27 +42,32 @@ vec3 color(const ray& r, hittable *world, int depth) {
     }
     else {
         vec3 unit_direction = unit_vector(r.direction());
-        float t = 0.5*(unit_direction.y() + 1.0);
+        double t = 0.5*(unit_direction.y() + 1.0);
         return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
     }
 }
 
 int main() {
 
-	int nx = 400; // Number of horizontal pixels
+	int nx = 200; // Number of horizontal pixels
 	int ny = 200; // Number of vertical pixels
-	int ns = 5; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
+	int ns = 10; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n"; // P3 signifies ASCII, 255 signifies max color value
+
+	vec3 lookFrom(3,3,2);
+	vec3 lookAt(0,0,-1);
+	double distToFocus = (lookFrom-lookAt).length();
+	double aperture = 1.0;
 
 	// Create spheres
 	hittable *list[4];
-	list[0] = new sphere(vec3(-1,0,-1), 0.5, new lambertian(vec3(0, 0, 1)));
+	list[0] = new sphere(vec3(-1,0,-1), 0.5, new dielectric(vec3(0, 0, .4), 1.6));
 	list[1] = new sphere(vec3( 0,0,-1), 0.5, new lambertian(vec3(1, 0, 0)));
-	list[2] = new sphere(vec3( 1,0,-1), 0.5, new lambertian(vec3(0, 1, 0)));
+	list[2] = new sphere(vec3( 1,0,-1), 0.5, new metal(vec3(0, .6, 0), 0));
 	list[3] = new sphere(vec3( 0,-100.5, -1), 100, new lambertian(vec3(1.0, 0.5, 1)));
 
 	hittable *world = new hittable_list(list,4);;
-	camera cam(vec3(-6,4,5), vec3(0,0,-1), vec3(0,1,0), 90, float(nx)/float(ny));
+	camera cam(lookFrom, lookAt, vec3(0,1,0), 20,double(nx)/double(ny), aperture, distToFocus);	
 	for (int j = ny - 1; j >= 0; j--) { // Navigate canvas
 		for (int i = 0; i < nx; i++) {
 			vec3 col(0, 0, 0);
