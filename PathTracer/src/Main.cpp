@@ -47,27 +47,61 @@ vec3 color(const ray& r, hittable *world, int depth) {
     }
 }
 
+hittable *random_scene() {
+    int n = 500;
+    hittable **list = new hittable*[n+1];
+    list[0] =  new sphere(vec3(0,-1000,0), 1000, new lambertian(vec3(0.5, 0.5, 0.5))); // "Ground"
+    int i = 1;
+    for (int a = -11; a < 11; a++) {
+        for (int b = -11; b < 11; b++) {
+            double randomMaterial = random_double(0,1);
+            vec3 center(a+0.9*random_double(0,1),0.2,b+0.9*random_double(0,1));
+            if ((center-vec3(4,0.2,0)).length() > 0.9) {
+                if (randomMaterial < 0.7) {  // diffuse
+                    list[i++] = new sphere(center, 0.2,
+                        new lambertian(vec3(random_double(0,1)*random_double(0,1),
+                                            random_double(0,1)*random_double(0,1),
+                                            random_double(0,1)*random_double(0,1))
+                        )
+                    );
+                }
+                else if (randomMaterial < 0.92) { // metal
+                    list[i++] = new sphere(center, 0.2,
+                            new metal(vec3(0.5*(1 + random_double(0,1)),
+                                           0.5*(1 + random_double(0,1)),
+                                           0.5*(1 + random_double(0,1))),
+                                      0.5*random_double(0,1)));
+                }
+                else {  // glass
+                    list[i++] = new sphere(center, 0.2, new dielectric(vec3(random_double(0,1),random_double(0,1),random_double(0,1)), 1.5));
+                }
+            }
+        }
+    }
+
+    list[i++] = new sphere(vec3(0, 1, 0), 1.0, new dielectric(vec3(0.9,0.9,0.0), 1.5));
+    list[i++] = new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1)));
+    list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
+
+    return new hittable_list(list,i);
+}
+
 int main() {
 
-	int nx = 200; // Number of horizontal pixels
-	int ny = 200; // Number of vertical pixels
-	int ns = 10; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
+	int nx = 1200; // Number of horizontal pixels
+	int ny = 800; // Number of vertical pixels
+	int ns = 11; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n"; // P3 signifies ASCII, 255 signifies max color value
 
-	vec3 lookFrom(3,3,2);
-	vec3 lookAt(0,0,-1);
+	vec3 lookFrom(13, 2, -3);
+	vec3 lookAt(0,0,0);
 	double distToFocus = (lookFrom-lookAt).length();
-	double aperture = 1.0;
+	double aperture = 1.0; // bigger = blurrier
+	
+	hittable *world = random_scene();
 
-	// Create spheres
-	hittable *list[4];
-	list[0] = new sphere(vec3(-1,0,-1), 0.5, new dielectric(vec3(0, 0, .4), 1.6));
-	list[1] = new sphere(vec3( 0,0,-1), 0.5, new lambertian(vec3(1, 0, 0)));
-	list[2] = new sphere(vec3( 1,0,-1), 0.5, new metal(vec3(0, .6, 0), 0));
-	list[3] = new sphere(vec3( 0,-100.5, -1), 100, new lambertian(vec3(1.0, 0.5, 1)));
-
-	hittable *world = new hittable_list(list,4);;
 	camera cam(lookFrom, lookAt, vec3(0,1,0), 20,double(nx)/double(ny), aperture, distToFocus);	
+
 	for (int j = ny - 1; j >= 0; j--) { // Navigate canvas
 		for (int i = 0; i < nx; i++) {
 			vec3 col(0, 0, 0);
