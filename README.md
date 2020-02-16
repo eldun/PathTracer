@@ -17,4 +17,4 @@ This is the first of three books in a series on Ray Tracing by Peter Shirley. To
 - Positionable Camera
 - Depth-of-field blur
 
-![Final output image](https://raw.githubusercontent.com/dunneev/PathTracer/master/PathTracer/PathTracer/reference/finishedProduct.png)
+![Final output image](PathTracer/PathTracer/reference/finishedProduct.png)
