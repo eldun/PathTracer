@@ -30,11 +30,15 @@ Additional/better graphics to illustrate ray tracing from the "1000 Forms of Bun
 */
 vec3 color(const ray& r, hittable *world, int depth) {
     hit_record rec;
+
+    if (depth <= 0) {
+        return vec3(0,0,0);
+    }  
     if (world->hit(r, 0.001, DBL_MAX, rec)) {
         ray scattered;
         vec3 attenuation; 
-        if (depth < 50 && rec.material_ptr->scatter(r, rec, attenuation, scattered)) {
-            return attenuation*color(scattered, world, depth+1);
+        if (rec.material_ptr->scatter(r, rec, attenuation, scattered)) {
+            return attenuation*color(scattered, world, depth-1);
         }
         else {
             return vec3(0,0,0);
@@ -91,13 +95,14 @@ int main() {
 	int nx = 1200; // Number of horizontal pixels
 	int ny = 800; // Number of vertical pixels
 	int ns = 11; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
+    int maxDepth = 60; // Ray bounce limit
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n"; // P3 signifies ASCII, 255 signifies max color value
 
 	vec3 lookFrom(13, 2, -3);
 	vec3 lookAt(0,0,0);
 	double distToFocus = (lookFrom-lookAt).length();
 	double aperture = 1.0; // bigger = blurrier
-	
+
 	hittable *world = random_scene();
 
 	camera cam(lookFrom, lookAt, vec3(0,1,0), 20,double(nx)/double(ny), aperture, distToFocus);	
@@ -110,7 +115,7 @@ int main() {
 				double v = (j + random_double(0.0, 0.999)) / double(ny);
 				ray r = cam.get_ray(u, v);
 				vec3 p = r.point_at_parameter(2.0);
-				col += color(r, world, 0);
+				col += color(r, world, maxDepth);
 			}
 
 			col /= double(ns); // Average the color between objects/background
