@@ -108,6 +108,7 @@ int main() {
 	camera cam(lookFrom, lookAt, vec3(0,1,0), 20,double(nx)/double(ny), aperture, distToFocus);	
 
 	for (int j = ny - 1; j >= 0; j--) { // Navigate canvas
+        std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
 		for (int i = 0; i < nx; i++) {
 			vec3 col(0, 0, 0);
 			for (int s = 0; s < ns; s++) { // Anti-aliasing - get ns samples for each pixel
@@ -126,4 +127,5 @@ int main() {
 			std::cout << ir << " " << ig << " " << ib << "\n";
 		}
 	}
+        std::cerr << "\nDone.\n";
 }
