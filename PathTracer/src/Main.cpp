@@ -1,4 +1,6 @@
+#include <chrono> // Record elapsed render time
 #include <iostream>
+#include <iomanip> // Time formatting
 #include <float.h>
 
 #include "sphere.h"
@@ -107,6 +109,9 @@ int main() {
 
 	camera cam(lookFrom, lookAt, vec3(0,1,0), 20,double(nx)/double(ny), aperture, distToFocus);	
 
+   	auto start = std::chrono::high_resolution_clock::now();
+
+
 	for (int j = ny - 1; j >= 0; j--) { // Navigate canvas
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
 		for (int i = 0; i < nx; i++) {
@@ -127,5 +132,15 @@ int main() {
 			std::cout << ir << " " << ig << " " << ib << "\n";
 		}
 	}
-        std::cerr << "\nDone.\n";
+    auto stop = std::chrono::high_resolution_clock::now();
+
+	auto hours = std::chrono::duration_cast<std::chrono::hours>(stop - start);
+	auto minutes = std::chrono::duration_cast<std::chrono::minutes>(stop - start) - hours;
+	auto seconds = std::chrono::duration_cast<std::chrono::seconds>(stop - start) - hours - minutes;
+
+    std::cerr << std::fixed << std::setprecision(2) << 
+	"\nDone in:" << std::endl << 
+	"\t" << hours.count() << " hours" << std::endl <<
+	"\t" << minutes.count() << " minutes" << std::endl <<
+	"\t" << seconds.count() << " seconds." << std::endl;
 }
