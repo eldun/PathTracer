@@ -36,24 +36,29 @@ public:
 
 bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
 	vec3 oc = r.origin() - center; // Vector from center to ray origin
-	double a = dot(r.direction(), r.direction());
-	double b = dot(oc, r.direction());
-	double c = dot(oc, oc) - radius*radius;
-	double discriminant = (b * b) - (a * c);
+	double a = r.direction().length_squared();
+	double halfB = dot(oc, r.direction());
+	double c = oc.length_squared() - radius*radius;
+	double discriminant = (halfB * halfB) - (a * c);
 	if (discriminant > 0.0) {
-		double temp = (-b - sqrt(discriminant)) / a; // quadratic
+        auto root = sqrt(discriminant);
+
+		auto temp = (-halfB - root) / a;
+
 		if (temp < t_max && temp > t_min) {
 			rec.t = temp;
 			rec.p = r.point_at_parameter(rec.t);
-			rec.normal = (rec.p - center) / radius;
+			vec3 outward_normal = (rec.p - center) / radius;
+            rec.set_face_normal(r, outward_normal);
 			rec.material_ptr = material_ptr;
 			return true;
 		}
-		temp = (-b + sqrt(discriminant)) / a;
+		temp = (-halfB + root) / a;
 		if (temp < t_max && temp > t_min) {
 			rec.t = temp;
 			rec.p = r.point_at_parameter(rec.t);
-			rec.normal = (rec.p - center) / radius;
+			vec3 outward_normal = (rec.p - center) / radius;
+            rec.set_face_normal(r, outward_normal);
 			rec.material_ptr = material_ptr;
 			return true;
 		}
