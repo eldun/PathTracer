@@ -38,7 +38,7 @@ public:
 	inline double length() const {
 		return sqrt(e[0]*e[0] + e[1]*e[1] + e[2]*e[2]);
 	}
-	inline double squared_length() const {
+	inline double length_squared() const {
 		return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
 	}
 	inline void make_unit_vector();
@@ -152,6 +152,36 @@ inline vec3& vec3::operator/=(const double t) {
 
 inline vec3 unit_vector(vec3 v) {
 	return v / v.length();
+}
+
+vec3 random_unit_vector() {
+    auto a = random_double(0, 2*pi);
+    auto z = random_double(-1, 1);
+    auto r = sqrt(1 - z*z);
+    return vec3(r*cos(a), r*sin(a), z);
+}
+
+/*
+* Rejection method to determine a random coordinate in the unit sphere
+* See RejectionSampling.png for a vizualization. This finds the random point S shown in Diffuse.png.
+*/
+vec3 random_unit_sphere_coordinate() {
+	vec3 p;
+	do {
+		p = 2.0 * vec3(random_double(0, 1), random_double(0, 1), random_double(0, 1)) - vec3(1, 1, 1);
+	} while (p.length_squared() >= 1.0);
+	return p;
+}
+
+// Real cameras are a bit more complicated than will be represented here.
+// For blur/DoF, ray origins will be on a disk rather than on a point.
+// See VirtualFilmPlane.png for a visualization.
+vec3 random_unit_disk_coordinate() {
+    vec3 p;
+    do {
+        p = 2.0*vec3(random_double(0,1),random_double(0,1),0) - vec3(1,1,0);
+    } while (dot(p,p) >= 1.0);
+    return p;
 }
 
 #endif // !VEC3H
