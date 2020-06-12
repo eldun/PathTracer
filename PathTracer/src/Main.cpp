@@ -3,10 +3,11 @@
 #include <iomanip> // Time formatting
 #include <float.h>
 
+#include "rtweekend.h"
+
 #include "sphere.h"
 #include "hittableList.h"
 #include "camera.h"
-#include "random.h"
 #include "material.h"
 
 /****************************************************************************************
@@ -94,16 +95,16 @@ hittable *random_scene() {
 
 int main() {
 
-	int nx = 1200; // Number of horizontal pixels
-	int ny = 800; // Number of vertical pixels
-	int ns = 11; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
+	int nx = 1600; // Number of horizontal pixels
+	int ny = 900; // Number of vertical pixels
+	int ns = 20; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
     int maxDepth = 60; // Ray bounce limit
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n"; // P3 signifies ASCII, 255 signifies max color value
 
-	vec3 lookFrom(13, 2, -3);
+	vec3 lookFrom(13, 2, -4);
 	vec3 lookAt(0,0,0);
 	double distToFocus = (lookFrom-lookAt).length();
-	double aperture = 1.0; // bigger = blurrier
+	double aperture = 0.1; // bigger = blurrier
 
 	hittable *world = random_scene();
 
