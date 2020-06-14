@@ -53,8 +53,8 @@ class lambertian : public material {
                             const hit_record& rec, 
                             vec3& attenuation, 
                             ray& scattered) const {
-            vec3 target = rec.p + rec.normal + random_unit_vector();
-            scattered = ray(rec.p, target - rec.p);
+            vec3 scatter_direction = rec.p + rec.normal + random_unit_vector();
+            scattered = ray(rec.p, scatter_direction - rec.p);
             attenuation = albedo;
             return true;
         }
