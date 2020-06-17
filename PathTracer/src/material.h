@@ -84,69 +84,50 @@ class metal : public material {
 };
 
 class dielectric : public material {
-public:
-    dielectric(const vec3& a, double ri) : albedo(a), ref_index(ri) {}
+    public:
+        dielectric(vec3 a, double ri) : albedo(a), ref_idx(ri) {}
 
-    bool scatter(const ray& ray_in,
-             const hit_record& rec,
-             vec3& attenuation,
-             ray& scattered
-             ) const {
+        virtual bool scatter(
+            const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered
+        ) const {
 
-                attenuation = albedo;
+            attenuation = albedo;
 
-                vec3 outward_normal;
-                vec3 reflected = reflect(ray_in.direction(), rec.normal);
-                vec3 refracted;
+            double n1_over_n2 = (rec.frontFace) ? (1.0 / ref_idx) : (ref_idx);
 
-                float ni_over_nt;
-                float reflect_prob;
-                float cosine;
+            vec3 unit_direction = unit_vector(r_in.direction());
+            
+            double cosine = fmin(dot(-unit_direction, rec.normal), 1.0);
+            double reflect_random = random_double(0,1);
+            double reflect_probability;
 
-    // Dealing with Ray Enter/Exit Object
-    // When a ray shoots through an object back into the vacuum,
-    // ni_over_nt is equal to the ref index, and the surface normal needs to be inverted
-    if (dot(ray_in.direction(), rec.normal) > 0){
-        outward_normal = -rec.normal;
-        ni_over_nt = ref_index;
-        cosine = dot(unit_vector(ray_in.direction()), rec.normal);
-    }
+            vec3 refracted;
+            vec3 reflected;
 
-    // Ray shoots into an object
-    else {
-        outward_normal = rec.normal;
-        ni_over_nt = 1 / ref_index;
-        cosine = -dot(unit_vector(ray_in.direction()), rec.normal);
-    }
+            if (refract(unit_direction, rec.normal, n1_over_n2, refracted)) {
+                reflect_probability = schlick(cosine, ref_idx);
 
+                if (reflect_random < reflect_probability) {
+                    vec3 reflected = reflect(unit_direction, rec.normal);
+                    scattered = ray(rec.p, reflected);
+                    return true;
+                }
+                scattered = ray(rec.p, refracted);
+                return true;
+            }
 
-    
-    // Dealing with Ray Reflection/Refraction (see Fresnel.gif)
-    // refracted ray exists
-    if(refract(ray_in.direction(), outward_normal, ni_over_nt, refracted)){
-        reflect_prob = schlick(cosine, ref_index);
-    }
-    // refracted ray does not exist
-    else{
-        // total reflection
-        reflect_prob = 1.0;
-    }
+            else {
+                reflected = reflect(unit_direction, rec.normal);
+                scattered = ray(rec.p, reflected);
+                return true;
+            }
 
-
-
-    // Reflection and refraction occur for dielectric materials, but we can only choose one ray for 'scattered'.
-    // Because we are multisampling each pixel, we can use the same idea to average the color between reflection and refraction.
-    if(random_double(0.001, 0.999) < reflect_prob) { // when total reflection happens, reflect_prob is 1
-        scattered = ray(rec.p, reflected);
-    }
-    else {
-        scattered = ray(rec.p, refracted);
-    }
-
-        return true;
-    }
-    double ref_index;
-    vec3 albedo;
+            
+        
+        }
+    public:
+        double ref_idx;
+        vec3 albedo;
 };
 
 
