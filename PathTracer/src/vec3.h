@@ -154,6 +154,11 @@ inline vec3 unit_vector(vec3 v) {
 	return v / v.length();
 }
 
+
+vec3 random_vec3(){
+	return vec3(random_double(0,1), random_double(0,1), random_double(0,1));
+}
+
 vec3 random_unit_vector() {
     auto a = random_double(0, 2*pi);
     auto z = random_double(-1, 1);
@@ -177,11 +182,11 @@ vec3 random_unit_sphere_coordinate() {
 // For blur/DoF, ray origins will be on a disk rather than on a point.
 // See VirtualFilmPlane.png for a visualization.
 vec3 random_unit_disk_coordinate() {
-    vec3 p;
-    do {
-        p = 2.0*vec3(random_double(0,1),random_double(0,1),0) - vec3(1,1,0);
-    } while (dot(p,p) >= 1.0);
-    return p;
+    while (true) {
+        auto p = vec3(random_double(-1,1), random_double(-1,1), 0);
+        if (p.length_squared() >= 1) continue;
+        return p;
+    }
 }
 
 #endif // !VEC3H
