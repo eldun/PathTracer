@@ -64,7 +64,7 @@ hittable *random_scene() {
             double randomMaterial = random_double(0,1);
             vec3 center(a+0.9*random_double(0,1),0.2,b+0.9*random_double(0,1));
             if ((center-vec3(4,0.2,0)).length() > 0.9) {
-                if (randomMaterial < 0.7) {  // diffuse
+                if (randomMaterial < 0.68) {  // diffuse
                     list[i++] = new sphere(center, 0.2,
                         new lambertian(vec3(random_double(0,1)*random_double(0,1),
                                             random_double(0,1)*random_double(0,1),
@@ -72,7 +72,7 @@ hittable *random_scene() {
                         )
                     );
                 }
-                else if (randomMaterial < 0.92) { // metal
+                else if (randomMaterial < 0.87) { // metal
                     list[i++] = new sphere(center, 0.2,
                             new metal(vec3(0.5*(1 + random_double(0,1)),
                                            0.5*(1 + random_double(0,1)),
@@ -86,27 +86,28 @@ hittable *random_scene() {
         }
     }
 
-    list[i++] = new sphere(vec3(0, 1, 0), 1.0, new dielectric(vec3(0.9,0.9,0.0), 1.5));
+    list[i++] = new sphere(vec3(0, 1, 0), 1.0, new dielectric(vec3(1.0,1.0,1.0), 1.5));
     list[i++] = new sphere(vec3(-4, 1, 0), 1.0, new lambertian(vec3(0.4, 0.2, 0.1)));
-    list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(0.7, 0.6, 0.5), 0.0));
+    list[i++] = new sphere(vec3(4, 1, 0), 1.0, new metal(vec3(1.0, 1.0, 1.0), 0.0));
 
     return new hittable_list(list,i);
 }
 
 int main() {
 
-	int nx = 1600; // Number of horizontal pixels
-	int ny = 900; // Number of vertical pixels
-	int ns = 20; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
-    int maxDepth = 60; // Ray bounce limit
+	int nx = 2000; // Number of horizontal pixels
+	int ny = 1000; // Number of vertical pixels
+	int ns = 50; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
+    int maxDepth = 50; // Ray bounce limit
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n"; // P3 signifies ASCII, 255 signifies max color value
 
-	vec3 lookFrom(13, 2, -4);
+	vec3 lookFrom(13, 2, 3);
 	vec3 lookAt(0,0,0);
+	vec3 vUp(0,1,0); // determine "up" for the camera
 	double distToFocus = (lookFrom-lookAt).length();
-	double aperture = 0.1; // bigger = blurrier
+	double aperture = 0.05; // bigger = blurrier
 
-	hittable *world = random_scene();
+    hittable *world = random_scene();
 
 	camera cam(lookFrom, lookAt, vec3(0,1,0), 20,double(nx)/double(ny), aperture, distToFocus);	
 
