@@ -10,9 +10,9 @@ This is the first of three books in a series on Ray Tracing by Peter Shirley. To
 
 - Outputting an image (.ppm file)
 - Using vectors to represent the world and its properties
-- Rays, A simple camera. and a background
+- Rays, a simple camera, and a background
 - Producing a sphere
-- Surface Normals, multiple hittable objects
+- Surface normals, multiple hittable objects
 - Anti-aliasing
 - Diffuse materials
 - Metallic materials
