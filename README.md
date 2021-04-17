@@ -1,9 +1,7 @@
 # PathTracer
-Learning about path tracing! Based on "Ray Tracing in One Weekend" by Peter Shirley
-(https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+Based on [Ray Tracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) by Peter Shirley
 
-with supplemental information from Victor Li's blog 
-(http://viclw17.github.io/)
+Supplemental information from [Victor Li's blog](http://viclw17.github.io/)
 
 
 This is the first of three books in a series on Ray Tracing by Peter Shirley. Topics covered from beginning to end include:
