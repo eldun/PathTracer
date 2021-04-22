@@ -6,14 +6,30 @@
 class sphere : public hittable {
 public:
 	sphere() {}
-	sphere(vec3 cen, float r, material* material) : center(cen), radius(r), material_ptr(material) {};
-	virtual bool hit(const ray& r, double tmin, double tmax, hit_record& rec) const;
-	vec3 center;
+	sphere(vec3 center, float radius, material *material) : 
+		centerStart(center), 
+		centerEnd(center), 
+		timeToTravel(0), 
+		radius(radius), 
+		material_ptr(material){};
+
+	// Moving sphere
+	sphere(vec3 centerStart, vec3 centerEnd, double timeToTravel, float radius, material *material) : 
+		centerStart(centerStart),
+		centerEnd(centerEnd),
+		timeToTravel(timeToTravel), 
+		radius(radius), 
+		material_ptr(material){};
+
+	virtual bool hit(const ray &r, double tmin, double tmax, hit_record &rec) const;
+
+	vec3 centerAt(double time) const;
+
+	vec3 centerStart, centerEnd;
+	double timeToTravel;
 	double radius;
-	material* material_ptr;
+	material *material_ptr;
 };
-
-
 
 /*
 * Check to see if a ray hits a sphere with center at *center* and radius *radius*.
@@ -32,24 +48,27 @@ public:
 * solving the quadratic equation for the unknown (t), will result
 * in a square root that is positive(two solutions), negative(no solutions), or zero(1 solution). See Quadratic.png for a visual.
 * I haven't done geometry in a while.
+*
+* Adding motion blur. Rays from the camera now exist at a point in time. Spheres can now move.
 */
 
-bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
-	vec3 oc = r.origin() - center; // Vector from center to ray origin
+bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) const
+{
+	vec3 oc = r.origin() - centerAt(r.moment()); // Vector from center to ray origin
 	double a = r.direction().length_squared();
 	double halfB = dot(oc, r.direction());
 	double c = oc.length_squared() - radius*radius;
 	double discriminant = (halfB * halfB) - (a * c);
 	if (discriminant > 0.0) {
-        auto root = sqrt(discriminant);
+		auto root = sqrt(discriminant);
 
 		auto temp = (-halfB - root) / a;
 
 		if (temp < t_max && temp > t_min) {
 			rec.t = temp;
 			rec.p = r.point_at_parameter(rec.t);
-			vec3 outward_normal = (rec.p - center) / radius;
-            rec.set_face_normal(r, outward_normal);
+			vec3 outward_normal = (rec.p - centerAt(r.moment())) / radius;
+			rec.set_face_normal(r, outward_normal);
 			rec.material_ptr = material_ptr;
 			return true;
 		}
@@ -57,13 +76,17 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 		if (temp < t_max && temp > t_min) {
 			rec.t = temp;
 			rec.p = r.point_at_parameter(rec.t);
-			vec3 outward_normal = (rec.p - center) / radius;
-            rec.set_face_normal(r, outward_normal);
+			vec3 outward_normal = (rec.p - centerAt(r.moment())) / radius;
+			rec.set_face_normal(r, outward_normal);
 			rec.material_ptr = material_ptr;
 			return true;
 		}
 	}
 	return false;
+}
+
+vec3 sphere::centerAt(double time) const {
+    return centerStart + (time / timeToTravel) * (centerEnd - centerStart);
 }
 
 #endif // !SPHEREH
