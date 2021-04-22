@@ -9,7 +9,7 @@ class camera
 {
 public:
     camera(vec3 lookFrom, vec3 lookAt, vec3 vUp, double vFov, double aspectRatio,
-           double aperture, double focusDistance, double shutterOpenTime, double shutterCloseTime)
+           double aperture, double focusDistance, double shutterOpenDuration)
     {
         lensRadius = aperture / 2;
         double theta = vFov * pi / 180;
@@ -22,8 +22,7 @@ public:
         lowerLeftCorner = origin - halfWidth * focusDistance * u - halfHeight * focusDistance * v - focusDistance * w;
         horizontal = 2 * halfWidth * focusDistance * u;
         vertical = 2 * halfHeight * focusDistance * v;
-        this->shutterOpenTime = shutterOpenTime;
-        this->shutterCloseTime = shutterCloseTime;
+        this->shutterOpenDuration = shutterOpenDuration;
     }
 
     ray get_ray(double s, double t)
@@ -32,7 +31,7 @@ public:
         vec3 offset = u * rd.x() + v * rd.y();
         return ray(origin + offset,
                    lowerLeftCorner + s * horizontal + t * vertical - origin - offset,
-                   random_double(shutterOpenTime, shutterCloseTime));
+                   random_double(0, shutterOpenDuration));
     }
 
 private:
@@ -42,8 +41,7 @@ private:
     vec3 vertical;
     vec3 u, v, w;
     double lensRadius;
-    double shutterOpenTime;
-    double shutterCloseTime;
+    double shutterOpenDuration;
 };
 
 #endif // !CAMERAH
