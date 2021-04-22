@@ -54,7 +54,7 @@ class lambertian : public material {
                             vec3& attenuation, 
                             ray& scattered) const {
             vec3 scatter_direction = rec.p + rec.normal + random_unit_vector();
-            scattered = ray(rec.p, scatter_direction - rec.p);
+            scattered = ray(rec.p, scatter_direction - rec.p, ray_in.moment());
             attenuation = albedo;
             return true;
         }
@@ -74,7 +74,7 @@ class metal : public material {
                             vec3& attenuation, 
                             ray& scattered) const {
         vec3 reflected = reflect(unit_vector(ray_in.direction()), rec.normal);
-        scattered = ray(rec.p, reflected + fuzz*random_unit_sphere_coordinate()); // large spheres or grazing rays may go below the surface. In that case, they'll just be absorbed.
+        scattered = ray(rec.p, reflected + fuzz*random_unit_sphere_coordinate(), ray_in.moment()); // large spheres or grazing rays may go below the surface. In that case, they'll just be absorbed.
         attenuation = albedo;
         return dot(scattered.direction(), rec.normal) > 0.0;
     }
@@ -88,14 +88,14 @@ class dielectric : public material {
         dielectric(vec3 a, double ri) : albedo(a), ref_idx(ri) {}
 
         virtual bool scatter(
-            const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered
+            const ray& ray_in, const hit_record& rec, vec3& attenuation, ray& scattered
         ) const {
 
             attenuation = albedo;
 
             double n1_over_n2 = (rec.frontFace) ? (1.0 / ref_idx) : (ref_idx);
 
-            vec3 unit_direction = unit_vector(r_in.direction());
+            vec3 unit_direction = unit_vector(ray_in.direction());
             
             double cosine = fmin(dot(-unit_direction, rec.normal), 1.0);
             double reflect_random = random_double(0,1);
@@ -109,16 +109,16 @@ class dielectric : public material {
 
                 if (reflect_random < reflect_probability) {
                     vec3 reflected = reflect(unit_direction, rec.normal);
-                    scattered = ray(rec.p, reflected);
+                    scattered = ray(rec.p, reflected, ray_in.moment());
                     return true;
                 }
-                scattered = ray(rec.p, refracted);
+                scattered = ray(rec.p, refracted, ray_in.moment());
                 return true;
             }
 
             else {
                 reflected = reflect(unit_direction, rec.normal);
-                scattered = ray(rec.p, reflected);
+                scattered = ray(rec.p, reflected, ray_in.moment());
                 return true;
             }
 
