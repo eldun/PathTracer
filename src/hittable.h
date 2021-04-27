@@ -3,6 +3,12 @@
 
 #include "ray.h"
 
+#include <memory>
+#include <vector>
+
+using std::shared_ptr;
+using std::make_shared;
+
 class material; // forward declaration
 
 struct hit_record {
@@ -10,7 +16,7 @@ struct hit_record {
 	vec3 p; // intersection point
 	vec3 normal;
 	bool frontFace;
-	material* material_ptr;
+	shared_ptr<material> material_ptr;
 
 	inline void set_face_normal(const ray& r, const vec3& outward_normal) {
         frontFace = dot(r.direction(), outward_normal) < 0;
