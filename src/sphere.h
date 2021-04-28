@@ -6,7 +6,7 @@
 class sphere : public hittable {
 public:
 	sphere() {}
-	sphere(vec3 center, float radius, material *material) : 
+	sphere(vec3 center, float radius, shared_ptr<material> material) : 
 		centerStart(center), 
 		centerEnd(center), 
 		timeToTravel(0), 
@@ -14,7 +14,7 @@ public:
 		material_ptr(material){};
 
 	// Moving sphere
-	sphere(vec3 centerStart, vec3 centerEnd, double timeToTravel, float radius, material *material) : 
+	sphere(vec3 centerStart, vec3 centerEnd, double timeToTravel, float radius, shared_ptr<material> material) : 
 		centerStart(centerStart),
 		centerEnd(centerEnd),
 		timeToTravel(timeToTravel), 
@@ -28,7 +28,7 @@ public:
 	vec3 centerStart, centerEnd;
 	double timeToTravel;
 	double radius;
-	material *material_ptr;
+	shared_ptr<material> material_ptr;
 };
 
 /*
@@ -86,8 +86,12 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 }
 
 vec3 sphere::centerAt(double time) const {
-    return centerStart + (time / timeToTravel) * (centerEnd - centerStart);
+	if (timeToTravel == 0){
+		return centerEnd;
+	}
+
+    return centerStart + (time / (timeToTravel))*(centerEnd - centerStart);
+	
 }
 
 #endif // !SPHEREH
-
