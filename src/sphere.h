@@ -79,25 +79,22 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 }
 
 vec3 sphere::centerAt(double time) const {
-	double timeToTravel = moveEndTime - moveStartTime;
 
-	// Impossibly fast. Set speed to avoid division by zero.
-	if (timeToTravel < .000001){
-		timeToTravel = .000001;
+	// Prevent divide by zero(naN) for static spheres
+	if (moveStartTime == moveEndTime) {
+		return centerStart;
 	}
 
-	// Prevent negative positioning
-	if (time - moveStartTime < .001) {
-		double chances = random_double(0,1);
-		if (chances < .5){
-			return centerStart;
-		}
-		else {
-			return centerEnd;
-		}
+	else if (time < moveStartTime){
+		return centerStart;
 	}
 
-    return centerStart + ((time - moveStartTime) / (timeToTravel))*(centerEnd - centerStart);	
+	else if (time > moveEndTime){
+		return centerEnd;
+	}
+
+	else 
+		return centerStart + ((time - moveStartTime) / (moveEndTime-moveStartTime))*(centerEnd - centerStart);	
 }
 
 #endif // !SPHEREH

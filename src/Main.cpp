@@ -96,7 +96,7 @@ hittable_list random_scene() {
     world.add(make_shared<sphere>(vec3(4, 1, 0), 1.0, make_shared<metal>(vec3(0.7, 0.6, 0.5), 0.0)));
 
     // Moving sphere
-    world.add(make_shared<sphere>(vec3(-4, 3, 0), vec3(4,3,0), 0, 1.0, make_shared<lambertian>(vec3(0.0, 0.0, 0.0))));
+    world.add(make_shared<sphere>(vec3(-4, 3, 0), vec3(4,3,0),.25, .75, 1.0, make_shared<lambertian>(vec3(0.0, 0.0, 0.0))));
 
 
     return world;
@@ -104,9 +104,9 @@ hittable_list random_scene() {
 
 int main() {
 
-	int nx = 400; // Number of horizontal pixels
-	int ny = 300; // Number of vertical pixels
-	int ns = 30; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
+	int nx = 1600; // Number of horizontal pixels
+	int ny = 900; // Number of vertical pixels
+	int ns = 60; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
     int maxDepth = 20; // Ray bounce limit
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n"; // P3 signifies ASCII, 255 signifies max color value
 
@@ -117,7 +117,7 @@ int main() {
 
 	auto world = random_scene();
 
-	camera cam(lookFrom, lookAt, vec3(0,1,0), 20,double(nx)/double(ny), aperture, distToFocus, 1.0);	
+	camera cam(lookFrom, lookAt, vec3(0,1,0), 20,double(nx)/double(ny), aperture, distToFocus, 1);	
 
    	auto start = std::chrono::high_resolution_clock::now();
 
