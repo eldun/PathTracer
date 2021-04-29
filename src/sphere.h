@@ -9,15 +9,17 @@ public:
 	sphere(vec3 center, float radius, shared_ptr<material> material) : 
 		centerStart(center), 
 		centerEnd(center), 
-		timeToTravel(0), 
+		moveStartTime(0),
+		moveEndTime(0),
 		radius(radius), 
 		material_ptr(material){};
 
 	// Moving sphere
-	sphere(vec3 centerStart, vec3 centerEnd, double timeToTravel, float radius, shared_ptr<material> material) : 
+	sphere(vec3 centerStart, vec3 centerEnd, double moveStartTime, double moveEndTime, float radius, shared_ptr<material> material) : 
 		centerStart(centerStart),
 		centerEnd(centerEnd),
-		timeToTravel(timeToTravel), 
+		moveStartTime(moveStartTime), 
+		moveEndTime(moveEndTime),
 		radius(radius), 
 		material_ptr(material){};
 
@@ -26,7 +28,7 @@ public:
 	vec3 centerAt(double time) const;
 
 	vec3 centerStart, centerEnd;
-	double timeToTravel;
+	double moveStartTime, moveEndTime;
 	double radius;
 	shared_ptr<material> material_ptr;
 };
@@ -72,26 +74,30 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 			rec.material_ptr = material_ptr;
 			return true;
 		}
-		temp = (-halfB + root) / a;
-		if (temp < t_max && temp > t_min) {
-			rec.t = temp;
-			rec.p = r.point_at_parameter(rec.t);
-			vec3 outward_normal = (rec.p - centerAt(r.moment())) / radius;
-			rec.set_face_normal(r, outward_normal);
-			rec.material_ptr = material_ptr;
-			return true;
-		}
 	}
 	return false;
 }
 
 vec3 sphere::centerAt(double time) const {
-	if (timeToTravel == 0){
-		return centerEnd;
+	double timeToTravel = moveEndTime - moveStartTime;
+
+	// Impossibly fast. Set speed to avoid division by zero.
+	if (timeToTravel < .000001){
+		timeToTravel = .000001;
 	}
 
-    return centerStart + (time / (timeToTravel))*(centerEnd - centerStart);
-	
+	// Prevent negative positioning
+	if (time - moveStartTime < .001) {
+		double chances = random_double(0,1);
+		if (chances < .5){
+			return centerStart;
+		}
+		else {
+			return centerEnd;
+		}
+	}
+
+    return centerStart + ((time - moveStartTime) / (timeToTravel))*(centerEnd - centerStart);	
 }
 
 #endif // !SPHEREH
