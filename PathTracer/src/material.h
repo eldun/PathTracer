@@ -93,7 +93,7 @@ class dielectric : public material {
 
             attenuation = albedo;
 
-            double n1_over_n2 = (rec.frontFace) ? (1.0 / ref_idx) : (ref_idx);
+            double n1_over_n2 = (rec.front_face) ? (1.0 / ref_idx) : (ref_idx);
 
             vec3 unit_direction = unit_vector(r_in.direction());
             
