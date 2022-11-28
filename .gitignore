@@ -338,5 +338,8 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+# Generated files
 /PathTracer/a.out
 /PathTracer/hello.ppm
+.vscode/settings.json
