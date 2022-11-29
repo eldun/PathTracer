@@ -24,6 +24,7 @@ public:
 		material_ptr(material){};
 
 	virtual bool hit(const ray &r, double tmin, double tmax, hit_record &rec) const;
+	virtual bool bounding_box(double time_start, double time_end, boundingBox& output_box) const override;
 
 	vec3 centerAt(double time) const;
 
@@ -76,6 +77,30 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
 		}
 	}
 	return false;
+}
+
+bool sphere::bounding_box(double time_start, double time_end, boundingBox& output_box) const {
+	
+	
+	boundingBox box_0 = bounding_box(
+			centerAt(time_start) - vec3(radius, radius, radius),
+			centerAt(time_start) + vec3(radius, radius, radius));
+
+	// Sphere is not moving
+	if (time_start-time_end < epsilon ) {
+		bounding_box = box_0
+		return true;
+	}
+
+	else {
+		boundingBox box_1 = bounding_box(
+			centerAt(time_end) - vec3(radius, radius, radius),
+			centerAt(time_end) + vec3(radius, radius, radius));
+		
+		output_box = surrounding_box(box_0, box_1)
+	}
+
+	
 }
 
 vec3 sphere::centerAt(double time) const {
