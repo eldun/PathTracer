@@ -3,10 +3,10 @@
 
 #include "hittable.h"
 
-class hittable_list : public hittable {
+class hittableList : public hittable {
 public:
-	hittable_list() {}
-	hittable_list(shared_ptr<hittable> object) {  }
+	hittableList() {}
+	hittableList(shared_ptr<hittable> object) {  }
 
 	void clear() { objects.clear(); }
     void add(shared_ptr<hittable> object) { objects.push_back(object); }
@@ -16,7 +16,7 @@ public:
 
 };
 
-bool hittable_list::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
+bool hittableList::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
 	hit_record temp_rec;
 	bool hit_anything = false;
 	double closest_so_far = t_max;
