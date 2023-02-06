@@ -1,14 +1,14 @@
 #ifndef CAMERAH
 #define CAMERAH
 
-#include "rtweekend.h"
+#include "RtWeekend.h"
 
-#include "ray.h"
+#include "Ray.h"
 
-class camera
+class Camera
 {
 public:
-    camera(vec3 lookFrom, vec3 lookAt, vec3 vUp, double vFov, double aspectRatio,
+    Camera(Vec3 lookFrom, Vec3 lookAt, Vec3 upDirection, double vFov, double aspectRatio,
            double aperture, double focusDistance, double shutterOpenDuration)
     {
         lensRadius = aperture / 2;
@@ -16,8 +16,8 @@ public:
         double halfHeight = tan(theta / 2);
         double halfWidth = aspectRatio * halfHeight;
         origin = lookFrom;
-        w = unit_vector(lookFrom - lookAt);
-        u = unit_vector(cross(vUp, w));
+        w = unitVector(lookFrom - lookAt);
+        u = unitVector(cross(upDirection, w));
         v = cross(w, u);
         lowerLeftCorner = origin - halfWidth * focusDistance * u - halfHeight * focusDistance * v - focusDistance * w;
         horizontal = 2 * halfWidth * focusDistance * u;
@@ -25,21 +25,21 @@ public:
         this->shutterOpenDuration = shutterOpenDuration;
     }
 
-    ray get_ray(double s, double t)
+    Ray getRay(double s, double t)
     {
-        vec3 rd = lensRadius * random_unit_disk_coordinate();
-        vec3 offset = u * rd.x() + v * rd.y();
-        return ray(origin + offset,
+        Vec3 rd = lensRadius * randomUnitDiskCoordinate();
+        Vec3 offset = u * rd.x() + v * rd.y();
+        return Ray(origin + offset,
                    lowerLeftCorner + s * horizontal + t * vertical - origin - offset,
-                   random_double(0, shutterOpenDuration));
+                   randomDouble(0, shutterOpenDuration));
     }
 
 private:
-    vec3 origin;
-    vec3 lowerLeftCorner;
-    vec3 horizontal;
-    vec3 vertical;
-    vec3 u, v, w;
+    Vec3 origin;
+    Vec3 lowerLeftCorner;
+    Vec3 horizontal;
+    Vec3 vertical;
+    Vec3 u, v, w;
     double lensRadius;
     double shutterOpenDuration;
 };
