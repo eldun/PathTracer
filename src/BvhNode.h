@@ -89,4 +89,27 @@ bool BvhNode::generateBoundingBox(double timeStart, double timeEnd, BoundingBox&
     return true;
 }
 
+inline bool compare(const shared_ptr<Hittable> a, const shared_ptr<Hittable> b, Axis axis) {
+    BoundingBox box0;
+    BoundingBox box1;
+
+    if (!a->generateBoundingBox(0,0, box0) || !b->generateBoundingBox(0,0, box1))
+        std::cerr << "No bounding box in BvhNode constructor.\n";
+
+    return box0.min().e[axis] < box1.min().e[axis];
+}
+
+
+bool compareX (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
+    return compare(a, b, Axis::x);
+}
+
+bool compareY (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
+    return compare(a, b, Axis::y);
+}
+
+bool compareZ (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
+    return compare(a, b, Axis::z);
+}
+
 #endif

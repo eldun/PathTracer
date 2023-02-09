@@ -6,21 +6,24 @@
 #include <limits>
 #include <memory>
 
+// Common Headers
+#include "Ray.h"
+#include "Vec3.h"
 
 // Usings
-
 using std::shared_ptr;
 using std::make_shared;
 using std::sqrt;
 
 // Constants
-
 const double infinity = std::numeric_limits<double>::infinity();
 const double pi = 3.1415926535897932385;
 const double epsilon = 0.00001;
 
-// Utility Functions
+// Enums
+enum Axis { x, y, z };
 
+// Utility Functions
 inline double degreesToRadians(double degrees) {
     return degrees * pi / 180;
 }
@@ -39,11 +42,5 @@ inline double randomDouble(double min, double max) {
     // Returns a random real in [min,max).
     return min + (max-min)*randomDouble();
 }
-
-
-// Common Headers
-
-#include "Ray.h"
-#include "Vec3.h"
 
 #endif
