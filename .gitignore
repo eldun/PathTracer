@@ -346,3 +346,4 @@ healthchecksdb
 
 # VIM files
 *.swp
+src/.vscode/settings.json
