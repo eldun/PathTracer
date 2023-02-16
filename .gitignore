@@ -346,6 +346,10 @@ healthchecksdb
 
 # VIM files
 *.swp
+src/.swo
 
 # VS Code Stuff
 src/.vscode/settings.json
+
+# Executables
+src/a.out
