@@ -27,22 +27,45 @@ class BvhNode : public Hittable {
 
         virtual bool generateBoundingBox(double timeStart, double timeEnd, BoundingBox& outputBox) const override;
 
-    public:
         shared_ptr<Hittable> left;
         shared_ptr<Hittable> right;
         BoundingBox box;
 };
 
+
+inline bool compare(const shared_ptr<Hittable> a, const shared_ptr<Hittable> b, Axis axis) {
+    BoundingBox box0;
+    BoundingBox box1;
+
+    if (!a->generateBoundingBox(0,0, box0) || !b->generateBoundingBox(0,0, box1))
+        std::cerr << "No bounding box in BvhNode constructor.\n";
+
+    return box0.min().e[axis] < box1.min().e[axis];
+}
+
+
+bool compareX (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
+    return compare(a, b, Axis::x);
+}
+
+bool compareY (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
+    return compare(a, b, Axis::y);
+}
+
+bool compareZ (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
+    return compare(a, b, Axis::z);
+}
+
+
 BvhNode::BvhNode(
     const std::vector<shared_ptr<Hittable>>& srcObjects,
-    size_t start, size_t end, double timeStart, double timeEnd
-) {
+    size_t start, size_t end, double timeStart, double timeEnd) {
     auto objects = srcObjects; // Create a modifiable array of the source scene objects
 
     int axis = randomInt(0,2);
-    auto comparator = (axis == 0) ? xBoxCompare
-                    : (axis == 1) ? yBoxCompare
-                                  : zBoxCompare;
+    auto comparator = (axis == 0) ? compareX
+                    : (axis == 1) ? compareY
+                                  : compareZ;
 
     size_t objectSpan = end - start;
 
@@ -87,29 +110,6 @@ bool BvhNode::hit(const Ray& r, double tMin, double tMax, HitRecord& rec) const 
 bool BvhNode::generateBoundingBox(double timeStart, double timeEnd, BoundingBox& outputBox) const {
     outputBox = box;
     return true;
-}
-
-inline bool compare(const shared_ptr<Hittable> a, const shared_ptr<Hittable> b, Axis axis) {
-    BoundingBox box0;
-    BoundingBox box1;
-
-    if (!a->generateBoundingBox(0,0, box0) || !b->generateBoundingBox(0,0, box1))
-        std::cerr << "No bounding box in BvhNode constructor.\n";
-
-    return box0.min().e[axis] < box1.min().e[axis];
-}
-
-
-bool compareX (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
-    return compare(a, b, Axis::x);
-}
-
-bool compareY (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
-    return compare(a, b, Axis::y);
-}
-
-bool compareZ (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
-    return compare(a, b, Axis::z);
 }
 
 #endif

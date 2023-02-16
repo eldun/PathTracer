@@ -54,7 +54,7 @@ class Lambertian : public Material {
                             Vec3& attenuation, 
                             Ray& scattered) const {
             Vec3 scatterDirection = rec.p + rec.normal + randomUnitVector();
-            scattered = ray(rec.p, scatterDirection - rec.p, rayIn.moment());
+            scattered = Ray(rec.p, scatterDirection - rec.p, rayIn.moment());
             attenuation = albedo;
             return true;
         }

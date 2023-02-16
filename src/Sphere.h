@@ -98,6 +98,7 @@ bool Sphere::generateBoundingBox(double timeStart, double timeEnd, BoundingBox& 
 			centerAt(timeEnd) + Vec3(radius, radius, radius));
 		
 		outputBox =  generateSurroundingBox(box0, box1);
+		return true;
 	}
 
 	

@@ -6,7 +6,7 @@
 class HittableList : public Hittable {
 public:
 	HittableList() {}
-	HittableList(shared_ptr<Hittable> object) {  }
+	HittableList(shared_ptr<Hittable> object) { add(object); }
 
 	void clear() { objects.clear(); }
     void add(shared_ptr<Hittable> object) { objects.push_back(object); }

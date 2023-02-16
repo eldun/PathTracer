@@ -6,9 +6,6 @@
 #include <limits>
 #include <memory>
 
-// Common Headers
-#include "Ray.h"
-#include "Vec3.h"
 
 // Usings
 using std::shared_ptr;
@@ -28,11 +25,6 @@ inline double degreesToRadians(double degrees) {
     return degrees * pi / 180;
 }
 
-inline int randomInt(int min, int max) {
-    // Returns a random integer in [min,max].
-    return static_cast<int>(randomDouble(min, max+1));
-}
-
 inline double randomDouble() {
     // Returns a random real in [0,1).
     return rand() / (RAND_MAX + 1.0);
@@ -42,5 +34,15 @@ inline double randomDouble(double min, double max) {
     // Returns a random real in [min,max).
     return min + (max-min)*randomDouble();
 }
+
+inline int randomInt(int min, int max) {
+    // Returns a random integer in [min,max].
+    return static_cast<int>(randomDouble(min, max+1));
+}
+
+// Common Headers
+#include "Ray.h"
+#include "Vec3.h"
+
 
 #endif

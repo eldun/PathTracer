@@ -5,6 +5,7 @@
 
 #include "RtWeekend.h"
 
+#include "BvhNode.h"
 #include "Sphere.h"
 #include "HittableList.h"
 #include "Camera.h"
@@ -31,7 +32,7 @@ Additional/better graphics to illustrate Ray tracing from the "1000 Forms of Bun
 * t = 0.0 = White
 * t = 1.0 = Blue
 */
-Vec3 color(const Ray& r, Hittable& world, int depth) {
+Vec3 color(const Ray& r, const Hittable& world, int depth) {
     HitRecord rec;
 
     if (depth <= 0) {
@@ -54,42 +55,13 @@ Vec3 color(const Ray& r, Hittable& world, int depth) {
     }
 }
 
-HittableList randomScene() {
+HittableList generateMovingSphereComparisonScene() {
     HittableList world;
     
     auto groundMaterial = make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5));
     auto groundSphere = make_shared<Sphere>(Vec3(0,-1000,0), 1000, groundMaterial);
 
     world.add(groundSphere);
-
-    // int i = 1;
-    // for (int a = -11; a < 11; a++) {
-    //     for (int b = -11; b < 11; b++) {
-
-    //         double random_material_value = randomDouble(0,1);
-    //         Vec3 generated_center(a+0.9*randomDouble(0,1),0.2,b+0.9*randomDouble(0,1));
-    //         Vec3 random_vec3(randomDouble(0,1), randomDouble(0,1), randomDouble(0,1));
-            
-
-    //         if ((generated_center-Vec3(4,0.2,0)).length() > 0.9) {
-    //             if (random_material_value < 0.7) {  // diffuse
-    //                 world.add(make_shared<Sphere>(generated_center, 
-    //                 0.2, 
-    //                 make_shared<Lambertian>(random_vec3)));
-    //             }
-    //             else if (random_material_value < 0.92) { // Metal
-    //                 world.add(make_shared<Sphere>(generated_center, 
-    //                 0.2, make_shared<Metal>(random_vec3, 0.5*randomDouble(0,1))));
-    //             }
-    //             else {  // glass
-    //                 world.add(make_shared<Sphere>(generated_center, 
-    //                 0.2, 
-    //                 make_shared<dielectric>(random_vec3, 1.5)));
-    //             }
-    //         }
-    //     }
-    // }
-
 
     world.add(make_shared<Sphere>(Vec3(0, 1, 0), 1.0, make_shared<Dielectric>(Vec3(0.9,0.9,0.0), 1.5)));
     world.add(make_shared<Sphere>(Vec3(-4, 1, 0), 1.0, make_shared<Lambertian>(Vec3(0.4, 0.2, 0.1))));
@@ -102,6 +74,56 @@ HittableList randomScene() {
     return world;
 }
 
+HittableList generateRandomScene(bool useBvh = true) {
+    HittableList world;
+
+    auto groundMaterial = make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5));
+    world.add(make_shared<Sphere>(Vec3(0,-1000,0), 1000, groundMaterial));
+
+    for (int a = -11; a < 11; a++) {
+        for (int b = -11; b < 11; b++) {
+            auto materialChance = randomDouble();
+            Vec3 center(a + 0.9*randomDouble(), 0.2, b + 0.9*randomDouble());
+
+            if ((center - Vec3(4, 0.2, 0)).length() > 0.9) {
+                shared_ptr<Material> sphereMaterial;
+
+                if (materialChance < 0.8) {
+                    // diffuse
+                    auto albedo = Vec3::random() * Vec3::random();
+                    sphereMaterial= make_shared<Lambertian>(albedo);
+                    world.add(make_shared<Sphere>(center, 0.2, sphereMaterial));
+                } else if (materialChance < 0.95) {
+                    // metal
+                    auto albedo = Vec3::random(0.5, 1);
+                    auto fuzz = randomDouble(0, 0.5);
+                    sphereMaterial = make_shared<Metal>(albedo, fuzz);
+                    world.add(make_shared<Sphere>(center, 0.2, sphereMaterial));
+                } else {
+                    // glass
+                    sphereMaterial = make_shared<Dielectric>(Vec3(0.9, 0.9, 0.9), 1.5);
+                    world.add(make_shared<Sphere>(center, 0.2, sphereMaterial));
+                }
+            }
+        }
+    }
+
+    auto material1 = make_shared<Dielectric>(Vec3(0.9, 0.9, 0.9), 1.5);
+    world.add(make_shared<Sphere>(Vec3(0, 1, 0), 1.0, material1));
+
+    auto material2 = make_shared<Lambertian>(Vec3(0.4, 0.2, 0.1));
+    world.add(make_shared<Sphere>(Vec3(-4, 1, 0), 1.0, material2));
+
+    auto material3 = make_shared<Metal>(Vec3(0.7, 0.6, 0.5), 0.0);
+    world.add(make_shared<Sphere>(Vec3(4, 1, 0), 1.0, material3));
+
+    if (useBvh)
+        return HittableList(make_shared<BvhNode>(world, 0.0, 1.0));
+        
+    return world;
+
+}
+
 int main() {
 
 	int nx = 1600; // Number of horizontal pixels
@@ -111,11 +133,12 @@ int main() {
 	std::cout << "P3\n" << nx << " " << ny << "\n255\n"; // P3 signifies ASCII, 255 signifies max color value
 
 	Vec3 lookFrom(0, 2, 24);
-	Vec3 lookAt(0,1,0);
+	Vec3 lookAt(0, 1, 0);
 	double distToFocus = (lookFrom-lookAt).length();
 	double aperture = 0.1; // bigger = blurrier
 
-	auto world = randomScene();
+	// auto world = generateMovingSphereComparisonScene();
+    auto world = generateRandomScene();
 
 	Camera cam(lookFrom, lookAt, Vec3(0,1,0), 20,double(nx)/double(ny), aperture, distToFocus, 1);	
 
@@ -148,7 +171,7 @@ int main() {
 	auto seconds = std::chrono::duration_cast<std::chrono::seconds>(stop - start) - hours - minutes;
 
     std::cerr << std::fixed << std::setprecision(2) << 
-	"\nDone in:" << std::endl << 
+	"\nFinished in:" << std::endl << 
 	"\t" << hours.count() << " hours" << std::endl <<
 	"\t" << minutes.count() << " minutes" << std::endl <<
 	"\t" << seconds.count() << " seconds." << std::endl;
