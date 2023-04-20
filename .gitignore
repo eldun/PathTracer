@@ -340,6 +340,12 @@ ASALocalRun/
 healthchecksdb
 
 # Generated files
-/PathTracer/a.out
+*a.out
 /PathTracer/hello.ppm
 .vscode/settings.json
+
+# Vim swap files
+*.swp
+
+# ctags (for jumping in vim
+tags
