@@ -347,6 +347,7 @@ healthchecksdb
 # VIM files
 *.swp
 src/.swo
+.ycm_extra_conf.py
 
 # VS Code Stuff
 src/.vscode/settings.json
@@ -354,5 +355,4 @@ src/.vscode/settings.json
 # Executables
 a.out
 tags
-.ycm_extra_conf.py
 generateImage
