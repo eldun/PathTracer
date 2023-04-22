@@ -352,5 +352,7 @@ src/.swo
 src/.vscode/settings.json
 
 # Executables
-src/a.out
+a.out
 tags
+.ycm_extra_conf.py
+generateImage
