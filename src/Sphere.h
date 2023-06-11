@@ -79,7 +79,7 @@ bool Sphere::hit(const Ray& r, double tMin, double tMax, HitRecord& rec) const
 	return false;
 }
 
-bool Sphere::generateBoundingBox(double timeStart, double timeEnd, BoundingBox& outputBox) const {
+bool Sphere::generateBoundingBox(double timeStart, double timeEnd, BoundingBox& outputBox) const override {
 	
 	
 	BoundingBox box0 = BoundingBox(
