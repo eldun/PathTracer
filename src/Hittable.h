@@ -14,6 +14,11 @@ class Material; // forward declaration
 
 struct HitRecord {
 	double t; // parameter of the ray that locates the intersection point
+	
+	// surface coordinates of the hit point(uv texture coordinates)
+	double u;
+	double v;
+
 	Vec3 p; // intersection point
 	Vec3 normal;
 	bool frontFace;
@@ -26,7 +31,7 @@ struct HitRecord {
 };
 
 /* 
-* A class for objects rays can hit.
+* Objects rays can hit.
 */
 class Hittable {
 public: 
