@@ -27,6 +27,7 @@ public:
 	virtual bool generateBoundingBox(double timeStart, double timeEnd, BoundingBox& outputBox) const override;
 
 	Vec3 centerAt(double time) const;
+	static void getUvCoordinates(const Vec3& p, float& u, float& v);
 
 	Vec3 centerStart, centerEnd;
 	double moveStartTime, moveEndTime;
@@ -122,5 +123,13 @@ Vec3 Sphere::centerAt(double time) const {
 	else 
 		return centerStart + ((time - moveStartTime) / (moveEndTime-moveStartTime))*(centerEnd - centerStart);	
 }
+
+
+void Sphere::getUvCoordinates(const Vec3& p, float& u, float& v){
+	float phi = atan2(p.z(), p.x());
+	float theta = asin(p.y());
+	u = 1 - (phi + M_PI) / (2 * M_PI);
+	v = (theta + M_PI / 2) / M_PI;
+	}
 
 #endif // !SPHEREH
