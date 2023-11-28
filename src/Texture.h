@@ -1,5 +1,5 @@
-#ifndef TEXTUREH
-#define TEXTUREH
+#ifndef TEXTURE_H
+#define TEXTURE_H
 
 #include "RtWeekend.h"
 

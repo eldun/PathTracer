@@ -1,5 +1,5 @@
-#ifndef MATERIALH
-#define MATERIALH
+#ifndef MATERIAL_H
+#define MATERIAL_H
 
 #include "Hittable.h"
 #include "Camera.h"
@@ -132,4 +132,4 @@ class Dielectric : public Material {
 
 
 
-#endif // !MATERIALH
+#endif // !MATERIAL_H

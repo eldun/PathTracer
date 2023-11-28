@@ -1,5 +1,5 @@
-#ifndef HITTABLEH
-#define HITTABLEH
+#ifndef HITTABLE_H
+#define HITTABLE_H
 
 #include "Ray.h"
 #include "BoundingBox.h"
@@ -40,5 +40,5 @@ public:
 
 };
 
-#endif // !HITTABLEH
+#endif // !HITTABLE_H
 

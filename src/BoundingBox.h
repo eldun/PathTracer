@@ -1,5 +1,5 @@
-#ifndef BOUNDINGBOXH
-#define BOUNDINGBOXH
+#ifndef BOUNDINGBOX_H
+#define BOUNDINGBOX_H
 
 #include "RtWeekend.h"
 

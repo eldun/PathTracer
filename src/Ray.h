@@ -1,5 +1,5 @@
-#ifndef RAYH
-#define RAYH
+#ifndef RAY_H
+#define RAY_H
 #include "Vec3.h"
 
 /*******************************************************************************
@@ -31,4 +31,4 @@ class Ray {
 		double mMoment;
 };
 
-#endif // !RAYH
+#endif // !RAY_H

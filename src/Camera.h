@@ -1,5 +1,5 @@
-#ifndef CAMERAH
-#define CAMERAH
+#ifndef CAMERA_H
+#define CAMERA_H
 
 #include "RtWeekend.h"
 
@@ -44,4 +44,4 @@ private:
     double shutterOpenDuration;
 };
 
-#endif // !CAMERAH
+#endif // !CAMERA_H

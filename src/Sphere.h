@@ -1,5 +1,5 @@
-#ifndef SPHEREH
-#define SPHEREH
+#ifndef SPHERE_H
+#define SPHERE_H
 
 #include "Hittable.h"
 
@@ -132,4 +132,4 @@ void Sphere::getUvCoordinates(const Vec3& p, float& u, float& v){
 	v = (theta + M_PI / 2) / M_PI;
 	}
 
-#endif // !SPHEREH
+#endif // !SPHERE_H

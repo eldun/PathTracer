@@ -1,5 +1,5 @@
-#ifndef VEC3H
-#define VEC3H
+#ifndef VEC3_H
+#define VEC3_H
 
 #include <math.h>
 #include <stdlib.h>
@@ -235,4 +235,4 @@ Vec3 randomUnitDiskCoordinate()
 	return p;
 }
 
-#endif // !VEC3H
+#endif // !VEC3_H

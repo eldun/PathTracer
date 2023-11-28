@@ -1,5 +1,5 @@
-#ifndef HITTABLELISTH
-#define HITTABLELISTH
+#ifndef HITTABLE_LIST_H
+#define HITTABLE_LIST_H
 
 #include "Hittable.h"
 
@@ -52,5 +52,5 @@ bool HittableList::generateBoundingBox(double timeStart, double timeEnd, Boundin
 	
 }
 
-#endif // !HITTABLELISTH
+#endif // !HITTABLE_LIST_H
 
