@@ -60,3 +60,10 @@ The final book in the <a href=https://raytracing.github.io/>"Ray Tracing in One 
   - Some Architectural Decisions
   - Cleaning Up PDF Management
 </details>
+
+# Usage
+Compile Main.cpp (or run `make`)and pipe the output of the resulting executable into a .ppm file:
+
+```
+./a.out > image.ppm
+```
