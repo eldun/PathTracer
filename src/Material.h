@@ -3,6 +3,7 @@
 
 #include "Hittable.h"
 #include "Camera.h"
+#include "Texture.h"
 
 
 // Simulate reflectivity of a Metal surface (see MetalReflectivity.png)
@@ -48,17 +49,19 @@ class Material {
 // Light may also be absorbed. See Diffuse.png for illustration and detailed description
 class Lambertian : public Material {
     public:
-        Lambertian(const Vec3& a) : albedo(a){};
+        Lambertian(const Vec3& a) : albedo(make_shared<SolidColor>(a)) {};
+        Lambertian(shared_ptr<Texture> a) : albedo(a) {}
+
         virtual bool scatter(const Ray& rayIn, 
                             const HitRecord& rec, 
                             Vec3& attenuation, 
                             Ray& scattered) const {
             Vec3 scatterDirection = rec.p + rec.normal + randomUnitVector();
             scattered = Ray(rec.p, scatterDirection - rec.p, rayIn.moment());
-            attenuation = albedo;
+            attenuation = albedo->value(rec.u, rec.v, rec.p);
             return true;
         }
-    Vec3 albedo; // reflectivity
+    shared_ptr<Texture> albedo; // reflectivity
 
 };
 
