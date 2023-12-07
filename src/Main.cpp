@@ -10,6 +10,7 @@
 #include "HittableList.h"
 #include "Camera.h"
 #include "Material.h"
+#include "Texture.h"
 
 /****************************************************************************************
 The code for this path tracer is based on "Ray Tracing in One Weekend" by Peter Shirley. 
@@ -77,8 +78,12 @@ HittableList generateMovingSphereComparisonScene() {
 HittableList generateRandomScene(bool useBvh = true) {
     HittableList world;
 
-    auto groundMaterial = make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5));
-    world.add(make_shared<Sphere>(Vec3(0,-1000,0), 1000, groundMaterial));
+    // auto groundMaterial = make_shared<Lambertian>(Vec3(0.5, 0.5, 0.5));
+    // world.add(make_shared<Sphere>(Vec3(0,-1000,0), 1000, groundMaterial));
+
+    auto checkerPattern = make_shared<CheckerTexture>(0.32, Vec3(.2, .3, .1), Vec3(.9, .9, .9));
+    world.add(make_shared<Sphere>(Vec3(0,-1000,0), 1000, make_shared<Lambertian>(checkerPattern)));
+
 
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
