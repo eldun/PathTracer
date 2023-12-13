@@ -9,9 +9,9 @@
 class Camera {
 public:
 
-    int imageWidth = 320; // Number of horizontal pixels
-	int samplesPerPixel = 60; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
-    int maxDepth = 20; // Ray bounce limit
+    int imageWidth = 1600; // Number of horizontal pixels
+	int samplesPerPixel = 100; // Number of samples for each pixel for anti-aliasing (see AntiAliasing.png for visualization)
+    int maxDepth = 40; // Ray bounce limit
 
 	Vec3 lookFrom = Vec3(13,2,3);
 	Vec3 lookAt = Vec3(0, 0, 0);
