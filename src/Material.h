@@ -88,6 +88,7 @@ class Metal : public Material {
 
 class Dielectric : public Material {
     public:
+        Dielectric(double ri) : refractiveIndex(ri) {}
         Dielectric(Vec3 a, double ri) : albedo(a), refractiveIndex(ri) {}
 
         virtual bool scatter(
@@ -130,7 +131,7 @@ class Dielectric : public Material {
         }
     public:
         double refractiveIndex;
-        Vec3 albedo;
+        Vec3 albedo = Vec3(0.9, 0.9, 0.9);
 };
 
 
