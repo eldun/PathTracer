@@ -83,8 +83,6 @@ private:
     double lensRadius;
     double imageHeight;
 
-        // Camera(Vec3 lookFrom, Vec3 lookAt, Vec3 upDirection, double vFov, double aspectRatio,
-    //        double aperture, double focusDistance, double shutterOpenDuration)
     void initialize() {
         imageHeight = static_cast<int>(imageWidth / aspectRatio);
         imageHeight = (imageHeight < 1) ? 1 : imageHeight;
