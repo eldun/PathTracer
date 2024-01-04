@@ -40,6 +40,10 @@ void generateMovingSphereComparisonScene() {
     world = HittableList(make_shared<BvhNode>(world, 0.0, 1.0));
 
     Camera cam;
+
+    cam.lookFrom = Vec3(0, 2, 24);
+	cam.lookAt = Vec3(0,1,0);
+
     cam.render(world);
 }
 
@@ -170,7 +174,7 @@ void generateTwoSpheres() {
 
 int main() {
 
-    switch (3) {
+    switch (2) {
     case 0:
         generateRandomScene();
         break;
