@@ -93,37 +93,50 @@ inline void Vec3::makeUnitVector()
 
 inline Vec3 operator+(const Vec3 &v1, const Vec3 &v2)
 {
-	return Vec3(v1.e[0] + v2.e[0], v1.e[1] + v2.e[1], v1.e[2] + v2.e[2]);
+	return Vec3(v1.e[0] + v2.e[0],
+	 			v1.e[1] + v2.e[1],
+	  			v1.e[2] + v2.e[2]);
 }
 
-inline Vec3 operator-(const Vec3 &v1, const Vec3 &v2)
-{
-	return Vec3(v1.e[0] - v2.e[0], v1.e[1] - v2.e[1], v1.e[2] - v2.e[2]);
+inline Vec3 operator-(const Vec3 &v1, const Vec3 &v2) {
+    return Vec3(v1.e[0] - v2.e[0], 
+				v1.e[1] - v2.e[1], 
+				v1.e[2] - v2.e[2]);
 }
 
 inline Vec3 operator*(const Vec3 &v1, const Vec3 &v2)
 {
-	return Vec3(v1.e[0] * v2.e[0], v1.e[1] * v2.e[1], v1.e[2] * v2.e[2]);
+	return Vec3(v1.e[0] * v2.e[0], 
+				v1.e[1] * v2.e[1], 
+				v1.e[2] * v2.e[2]);
 }
 
 inline Vec3 operator/(const Vec3 &v1, const Vec3 &v2)
 {
-	return Vec3(v1.e[0] / v2.e[0], v1.e[1] / v2.e[1], v1.e[2] / v2.e[2]);
+	return Vec3(v1.e[0] / v2.e[0], 
+				v1.e[1] / v2.e[1], 
+				v1.e[2] / v2.e[2]);
 }
 
 inline Vec3 operator*(double t, const Vec3 &v)
 {
-	return Vec3(t * v.e[0], t * v.e[1], t * v.e[2]);
+	return Vec3(t * v.e[0], 
+				t * v.e[1], 
+				t * v.e[2]);
 }
 
 inline Vec3 operator/(const Vec3 v, double t)
 {
-	return Vec3(v.e[0] / t, v.e[1] / t, v.e[2] / t);
+	return Vec3(v.e[0] / t, 
+				v.e[1] / t, 
+				v.e[2] / t);
 }
 
 inline Vec3 operator*(const Vec3 &v, double t)
 {
-	return Vec3(t * v.e[0], t * v.e[1], t * v.e[2]);
+	return Vec3(t * v.e[0], 
+				t * v.e[1], 
+				t * v.e[2]);
 }
 
 // Dot product
@@ -196,31 +209,29 @@ inline Vec3 unitVector(Vec3 v)
 }
 
 /*
+ * Rejection method to determine a random coordinate in the unit Sphere
+ * See RejectionSampling.png for a vizualization. This finds the random point S shown in Diffuse.png.
+ */
+Vec3 randomUnitSphereCoordinate()
+{
+	while (true) {
+        auto p = Vec3::random(-1,1);
+        if (p.lengthSquared() < 1)
+            return p;
+    }
+}
+
+/*
  * Used for calculating true lambertian reflections.
  * See here for more:
  * https://eldun.github.io/2020/06/19/ray-tracing-in-one-weekend-part-two.html#true-lambertian-reflection
  */
 Vec3 randomUnitVector()
 {
-	auto a = randomDouble(0, 2 * pi);
-	auto z = randomDouble(-1, 1);
-	auto r = sqrt(1 - z * z);
-	return Vec3(r * cos(a), r * sin(a), z);
+	return unitVector(randomUnitSphereCoordinate());
 }
 
-/*
- * Rejection method to determine a random coordinate in the unit Sphere
- * See RejectionSampling.png for a vizualization. This finds the random point S shown in Diffuse.png.
- */
-Vec3 randomUnitSphereCoordinate()
-{
-	Vec3 p;
-	do
-	{
-		p = 2.0 * Vec3(randomDouble(0, 1), randomDouble(0, 1), randomDouble(0, 1)) - Vec3(1, 1, 1);
-	} while (p.lengthSquared() >= 1.0);
-	return p;
-}
+
 
 // Real cameras are a bit more complicated than will be represented here.
 // For blur/DoF, Ray origins will be on a disk rather than on a point.
