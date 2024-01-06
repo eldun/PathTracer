@@ -357,3 +357,5 @@ a.out
 tags
 generateImage
 .vscode/tasks.json
+*.ppm
+*.exe
