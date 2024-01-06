@@ -356,3 +356,4 @@ src/.vscode/settings.json
 a.out
 tags
 generateImage
+.vscode/tasks.json
