@@ -21,7 +21,10 @@ public:
 		moveStartTime(moveStartTime), 
 		moveEndTime(moveEndTime),
 		radius(radius), 
-		materialPtr(material){};
+		materialPtr(material)
+		{
+			centerVec = centerEnd - centerStart;
+		};
 
 	virtual bool hit(const Ray &r, double tmin, double tmax, HitRecord &rec) const;
 	virtual bool generateBoundingBox(double timeStart, double timeEnd, BoundingBox& outputBox) const override;
@@ -29,7 +32,8 @@ public:
 	Vec3 centerAt(double time) const;
 	static void getUvCoordinates(const Vec3& p, float& u, float& v);
 
-	Vec3 centerStart, centerEnd;
+	private:
+		Vec3 centerStart, centerVec, centerEnd;
 	double moveStartTime, moveEndTime;
 	double radius;
 	shared_ptr<Material> materialPtr;
@@ -121,7 +125,7 @@ Vec3 Sphere::centerAt(double time) const {
 	}
 
 	else 
-		return centerStart + ((time - moveStartTime) / (moveEndTime-moveStartTime))*(centerEnd - centerStart);	
+		return centerStart + (time * centerVec);
 }
 
 
