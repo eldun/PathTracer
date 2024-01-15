@@ -5,6 +5,7 @@
 
 #include "Ray.h"
 #include "Material.h"
+#include "Interval.h"
 
 class Camera {
 public:
@@ -106,7 +107,7 @@ private:
         if (depth <= 0) {
             return Vec3(0,0,0);
         }
-        if (world.hit(r, 0.001, DBL_MAX, rec)) {
+        if (world.hit(r, Interval(.001, infinity), rec)) {
             Ray scattered;
             Vec3 attenuation;
             if (rec.materialPtr->scatter(r, rec, attenuation, scattered)) {

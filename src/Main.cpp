@@ -37,7 +37,7 @@ void generateMovingSphereComparisonScene() {
     world.add(make_shared<Sphere>(Vec3(-4, 3, 0), Vec3(4,3,0),0, 1, 1.0, make_shared<Lambertian>(Vec3(0.0, 0.0, 0.0))));
 
     // BVH
-    world = HittableList(make_shared<BvhNode>(world, 0.0, 1.0));
+    world = HittableList(make_shared<BvhNode>(world));
 
     Camera cam;
     cam.imageWidth = 400;
@@ -76,7 +76,7 @@ void generateBouncySphere() {
     //     world.add(make_shared<Sphere>(center, center2, 0, 1, 0.2, sphereMaterial));
     // }
 
-    world = HittableList(make_shared<BvhNode>(world, 0.0, 1.0));
+    world = HittableList(make_shared<BvhNode>(world));
 
     Camera cam;
     // cam.lookFrom = Vec3(0, 10, -20);
@@ -134,7 +134,7 @@ void generateRandomBouncyScene() {
     auto material3 = make_shared<Metal>(Vec3(0.7, 0.6, 0.5), 0.0);
     world.add(make_shared<Sphere>(Vec3(4, 1, 0), 1.0, material3));
 
-    world = HittableList(make_shared<BvhNode>(world, 0.0, 1.0));
+    world = HittableList(make_shared<BvhNode>(world));
 
     Camera cam;
     
@@ -187,7 +187,7 @@ void generateCheckeredRandomScene(bool useBvh = true) {
     world.add(make_shared<Sphere>(Vec3(4, 1, 0), 1.0, material3));
 
     if (useBvh)
-        world = HittableList(make_shared<BvhNode>(world, 0.0, 1.0));
+        world = HittableList(make_shared<BvhNode>(world));
 
     Camera cam;
     cam.render(world);
@@ -238,7 +238,7 @@ void generateCheckeredRandomBouncyScene() {
         auto material3 = make_shared<Metal>(Vec3(0.7, 0.6, 0.5), 0.0);
         world.add(make_shared<Sphere>(Vec3(4, 1, 0), 1.0, material3));
 
-        world = HittableList(make_shared<BvhNode>(world, 0.0, 1.0));
+        world = HittableList(make_shared<BvhNode>(world));
 
         Camera cam;
         cam.render(world);
@@ -266,7 +266,7 @@ void generateTwoSpheres() {
 
 int main() {
 
-    switch (5) {
+    switch (1) {
     case 0:
         generateCheckeredRandomScene();
         break;

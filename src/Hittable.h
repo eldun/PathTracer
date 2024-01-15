@@ -35,8 +35,8 @@ struct HitRecord {
 */
 class Hittable {
 public: 
-	virtual bool hit(const Ray& r, double tMin, double tMax, HitRecord& rec) const = 0;
-	virtual bool generateBoundingBox(double timeStart, double timeEnd, BoundingBox& outputBox) const = 0;
+  	virtual bool hit(const Ray& r, Interval ray_t, HitRecord& rec) const = 0;
+	virtual BoundingBox getBoundingBox() const = 0;
 
 };
 

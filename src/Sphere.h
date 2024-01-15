@@ -2,17 +2,24 @@
 #define SPHERE_H
 
 #include "Hittable.h"
+#include "BoundingBox.h"
 
 class Sphere : public Hittable {
 public:
 	Sphere() {}
+
+	// Stationary Sphere
 	Sphere(Vec3 center, float radius, shared_ptr<Material> material) : 
 		centerStart(center), 
 		centerEnd(center), 
 		moveStartTime(0),
 		moveEndTime(0),
 		radius(radius), 
-		materialPtr(material){};
+		materialPtr(material)
+		{
+			auto rVec = Vec3(radius, radius, radius);
+			this->boundingBox = BoundingBox(center - rVec, center + rVec);
+		};
 
 	// Moving Sphere
 	Sphere(Vec3 centerStart, Vec3 centerEnd, double moveStartTime, double moveEndTime, float radius, shared_ptr<Material> material) : 
@@ -23,20 +30,25 @@ public:
 		radius(radius), 
 		materialPtr(material)
 		{
+			auto rVec = Vec3(radius, radius, radius);
+			BoundingBox box1(centerStart - rVec, centerStart + rVec);
+			BoundingBox box2(centerEnd - rVec, centerEnd + rVec);
+			boundingBox = BoundingBox(box1, box2); 
+
 			centerVec = centerEnd - centerStart;
 		};
 
-	virtual bool hit(const Ray &r, double tmin, double tmax, HitRecord &rec) const;
-	virtual bool generateBoundingBox(double timeStart, double timeEnd, BoundingBox& outputBox) const override;
-
+	bool hit(const Ray &r, Interval ray_t, HitRecord &rec) const override;
 	Vec3 centerAt(double time) const;
+	BoundingBox getBoundingBox() const override { return boundingBox; }
 	static void getUvCoordinates(const Vec3& p, float& u, float& v);
 
-	private:
-		Vec3 centerStart, centerVec, centerEnd;
+private:
+	Vec3 centerStart, centerVec, centerEnd;
 	double moveStartTime, moveEndTime;
 	double radius;
 	shared_ptr<Material> materialPtr;
+	BoundingBox boundingBox;
 };
 
 /*
@@ -60,53 +72,34 @@ public:
 * Adding motion blur. Rays from the camera now exist at a point in time. Spheres can now move.
 */
 
-bool Sphere::hit(const Ray& r, double tMin, double tMax, HitRecord& rec) const
-{
-	Vec3 oc = r.origin() - centerAt(r.moment()); // Vector from center to ray origin
+bool Sphere::hit(const Ray& r, Interval ray_t, HitRecord& rec) const {
+	Vec3 center = centerAt(r.moment());
+	Vec3 oc = r.origin() - center; // Vector from center to ray origin
 	double a = r.direction().lengthSquared();
 	double halfB = dot(oc, r.direction());
 	double c = oc.lengthSquared() - radius*radius;
 	double discriminant = (halfB * halfB) - (a * c);
-	if (discriminant > 0.0) {
-		auto root = sqrt(discriminant);
+	if (discriminant < 0) {
+            return false;
+	}
 
-		auto temp = (-halfB - root) / a;
-
-		if (temp < tMax && temp > tMin) {
-			rec.t = temp;
-			rec.p = r.pointAtParameter(rec.t);
-			Vec3 outwardNormal = (rec.p - centerAt(r.moment())) / radius;
-			rec.setFaceNormal(r, outwardNormal);
-			rec.materialPtr = materialPtr;
-			return true;
+		// Find the nearest root that lies in the acceptable range.
+        auto sqrtd = sqrt(discriminant);
+        auto root = (-halfB - sqrtd) / a;
+        if (!ray_t.surrounds(root)) {
+            root = (-halfB + sqrtd) / a;
+            if (!ray_t.surrounds(root))
+                return false;
 		}
-	}
-	return false;
-}
 
-bool Sphere::generateBoundingBox(double timeStart, double timeEnd, BoundingBox& outputBox) const {
-	
-	
-	BoundingBox box0 = BoundingBox(
-			centerAt(timeStart) - Vec3(radius, radius, radius),
-			centerAt(timeStart) + Vec3(radius, radius, radius));
+		rec.t = root;
+        rec.p = r.pointAtParameter(rec.t);
+        Vec3 outward_normal = (rec.p - center) / radius;
+        rec.setFaceNormal(r, outward_normal);
+        (outward_normal, rec.u, rec.v);
+        rec.materialPtr = materialPtr;
 
-	// Sphere is not moving
-	if (timeStart-timeEnd < epsilon ) {
-		outputBox = box0;
-		return true;
-	}
-
-	else {
-		BoundingBox box1 = BoundingBox(
-			centerAt(timeEnd) - Vec3(radius, radius, radius),
-			centerAt(timeEnd) + Vec3(radius, radius, radius));
-		
-		outputBox =  generateSurroundingBox(box0, box1);
-		return true;
-	}
-
-	
+        return true;	
 }
 
 Vec3 Sphere::centerAt(double time) const {

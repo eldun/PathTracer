@@ -1,5 +1,5 @@
-#ifndef BVH_H
-#define BVH_H
+#ifndef BVH_NODE_H
+#define BVH_NODE_H
 
 #include <algorithm>
 
@@ -10,106 +10,75 @@
 
 
 class BvhNode : public Hittable {
-    public:
-    
-        BvhNode();
+  public:
 
-        BvhNode(const HittableList& list, double timeStart, double timeEnd)
-            : BvhNode(list.objects, 0, list.objects.size(), timeStart, timeEnd)
-        {}
+    BvhNode(const HittableList& list) : BvhNode(list.objects, 0, list.objects.size()) {}
 
-        BvhNode(
-            const std::vector<shared_ptr<Hittable>>& srcObjects,
-            size_t start, size_t end, double timeStart, double timeEnd);
+    BvhNode(const std::vector<shared_ptr<Hittable>>& src_objects, size_t start, size_t end) {
+        auto objects = src_objects; // Create a modifiable array of the source scene objects
 
-        virtual bool hit(
-            const Ray& r, double tMin, double tMax, HitRecord& rec) const override;
+        int axis = randomInt(0,2);
+        auto comparator = (axis == 0) ? boxCompareX
+                        : (axis == 1) ? boxCompareY
+                                      : boxCompareZ;
 
-        virtual bool generateBoundingBox(double timeStart, double timeEnd, BoundingBox& outputBox) const override;
+        size_t object_span = end - start;
 
-        shared_ptr<Hittable> left;
-        shared_ptr<Hittable> right;
-        BoundingBox box;
-};
-
-
-inline bool compare(const shared_ptr<Hittable> a, const shared_ptr<Hittable> b, Axis axis) {
-    BoundingBox box0;
-    BoundingBox box1;
-
-    if (!a->generateBoundingBox(0,0, box0) || !b->generateBoundingBox(0,0, box1))
-        std::cerr << "No bounding box in BvhNode constructor.\n";
-
-    return box0.min().e[axis] < box1.min().e[axis];
-}
-
-
-bool compareX (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
-    return compare(a, b, Axis::x);
-}
-
-bool compareY (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
-    return compare(a, b, Axis::y);
-}
-
-bool compareZ (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
-    return compare(a, b, Axis::z);
-}
-
-
-BvhNode::BvhNode(
-    const std::vector<shared_ptr<Hittable>>& srcObjects,
-    size_t start, size_t end, double timeStart, double timeEnd) {
-    auto objects = srcObjects; // Create a modifiable array of the source scene objects
-
-    int axis = randomInt(0,2);
-    auto comparator = (axis == 0) ? compareX
-                    : (axis == 1) ? compareY
-                                  : compareZ;
-
-    size_t objectSpan = end - start;
-
-    if (objectSpan == 1) {
-        left = right = objects[start];
-    } else if (objectSpan == 2) {
-        if (comparator(objects[start], objects[start+1])) {
-            left = objects[start];
-            right = objects[start+1];
+        if (object_span == 1) {
+            left = right = objects[start];
+        } else if (object_span == 2) {
+            if (comparator(objects[start], objects[start+1])) {
+                left = objects[start];
+                right = objects[start+1];
+            } else {
+                left = objects[start+1];
+                right = objects[start];
+            }
         } else {
-            left = objects[start+1];
-            right = objects[start];
-        }
-    } else {
-        std::sort(objects.begin() + start, objects.begin() + end, comparator);
+            std::sort(objects.begin() + start, objects.begin() + end, comparator);
 
-        auto mid = start + objectSpan/2;
-        left = make_shared<BvhNode>(objects, start, mid, timeStart, timeEnd);
-        right = make_shared<BvhNode>(objects, mid, end, timeStart, timeEnd);
+            auto mid = start + object_span/2;
+            left = make_shared<BvhNode>(objects, start, mid);
+            right = make_shared<BvhNode>(objects, mid, end);
+        }
+
+        boundingBox = BoundingBox(left->getBoundingBox(), right->getBoundingBox());
     }
 
-    BoundingBox boxLeft, boxRight;
+    bool hit(const Ray& r, Interval ray_t, HitRecord& rec) const override {
+        if (!boundingBox.hit(r, ray_t))
+            return false;
 
-    if (  !left->generateBoundingBox (timeStart, timeEnd, boxLeft)
-       || !right->generateBoundingBox(timeStart, timeEnd, boxRight)
-    )
-        std::cerr << "No bounding box in BvhNode constructor.\n";
+        bool hit_left = left->hit(r, ray_t, rec);
+        bool hit_right = right->hit(r, Interval(ray_t.min, hit_left ? rec.t : ray_t.max), rec);
 
-    box = generateSurroundingBox(boxLeft, boxRight);
-}
+        return hit_left || hit_right;
+    }
 
-bool BvhNode::hit(const Ray& r, double tMin, double tMax, HitRecord& rec) const {
-    if (!box.hit(r, tMin, tMax))
-        return false;
+    BoundingBox getBoundingBox() const override { return boundingBox; }
 
-    bool hitLeft = left->hit(r, tMin, tMax, rec);
-    bool hitRight = right->hit(r, tMin, hitLeft ? rec.t : tMax, rec);
+  private:
+    shared_ptr<Hittable> left;
+    shared_ptr<Hittable> right;
+    BoundingBox boundingBox;
 
-    return hitLeft || hitRight;
-}
+    static bool boxCompare(
+        const shared_ptr<Hittable> a, const shared_ptr<Hittable> b, int axis_index
+    ) {
+        return a->getBoundingBox().axis(axis_index).min < b->getBoundingBox().axis(axis_index).min;
+    }
 
-bool BvhNode::generateBoundingBox(double timeStart, double timeEnd, BoundingBox& outputBox) const {
-    outputBox = box;
-    return true;
-}
+    static bool boxCompareX (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
+        return boxCompare(a, b, 0);
+    }
+
+    static bool boxCompareY (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
+        return boxCompare(a, b, 1);
+    }
+
+    static bool boxCompareZ (const shared_ptr<Hittable> a, const shared_ptr<Hittable> b) {
+        return boxCompare(a, b, 2);
+    }
+};
 
 #endif
