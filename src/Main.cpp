@@ -264,9 +264,33 @@ void generateTwoSpheres() {
     cam.render(world);
 }
 
+void generateEarth() {
+    HittableList world;
+
+    auto earthTexture = make_shared<ImageTexture>("earthmap.jpg");
+    auto earthSurface = make_shared<Lambertian>(earthTexture);
+    auto globe = make_shared<Sphere>(Vec3(0,0,0), 2, earthSurface);
+
+    world.add(globe);
+
+    Camera cam;
+
+    cam.aspectRatio         = 16.0 / 9.0;
+    cam.samplesPerPixel     = 100;
+    cam.maxDepth            = 50;
+
+    cam.vFov                = 20;
+    cam.lookFrom            = Vec3(0,0,12);
+    cam.lookAt              = Vec3(0,0,0);
+    cam.upDirection         = Vec3(0,1,0);
+
+
+    cam.render(world);
+}
+
 int main() {
 
-    switch (1) {
+    switch (6) {
     case 0:
         generateCheckeredRandomScene();
         break;
@@ -289,6 +313,10 @@ int main() {
 
     case 5:
         generateBouncySphere();
+        break;
+
+    case 6:
+        generateEarth();
         break;
 
     default:

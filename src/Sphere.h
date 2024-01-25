@@ -41,7 +41,6 @@ public:
 	bool hit(const Ray &r, Interval ray_t, HitRecord &rec) const override;
 	Vec3 centerAt(double time) const;
 	BoundingBox getBoundingBox() const override { return boundingBox; }
-	static void getUvCoordinates(const Vec3& p, float& u, float& v);
 
 private:
 	Vec3 centerStart, centerVec, centerEnd;
@@ -49,6 +48,7 @@ private:
 	double radius;
 	shared_ptr<Material> materialPtr;
 	BoundingBox boundingBox;
+	static void getUvCoordinates(const Vec3& p, double& u, double& v);
 };
 
 /*
@@ -96,8 +96,8 @@ bool Sphere::hit(const Ray& r, Interval ray_t, HitRecord& rec) const {
         rec.p = r.pointAtParameter(rec.t);
         Vec3 outward_normal = (rec.p - center) / radius;
         rec.setFaceNormal(r, outward_normal);
-        (outward_normal, rec.u, rec.v);
-        rec.materialPtr = materialPtr;
+        getUvCoordinates(outward_normal, rec.u, rec.v);
+		rec.materialPtr = materialPtr;
 
         return true;	
 }
@@ -122,11 +122,19 @@ Vec3 Sphere::centerAt(double time) const {
 }
 
 
-void Sphere::getUvCoordinates(const Vec3& p, float& u, float& v){
-	float phi = atan2(p.z(), p.x());
-	float theta = asin(p.y());
-	u = 1 - (phi + M_PI) / (2 * M_PI);
-	v = (theta + M_PI / 2) / M_PI;
-	}
+void Sphere::getUvCoordinates(const Vec3& p, double& u, double& v){
+	// p: a given point on the sphere of radius one, centered at the origin.
+	// u: returned value [0,1] of angle around the Y axis from X=-1.	
+	// v: returned value [0,1] of angle from Y=-1 to Y=+1.	
+	//     <1 0 0> yields <0.50 0.50>       <-1  0  0> yields <0.00 0.50>	
+	//     <0 1 0> yields <0.50 1.00>       < 0 -1  0> yields <0.50 0.00>	
+	//     <0 0 1> yields <0.25 0.50>       < 0  0 -1> yields <0.75 0.50>	
+
+	auto theta = acos(-p.y());
+	auto phi = atan2(-p.z(), p.x()) + pi;
+
+	u = phi / (2*pi);
+	v = theta / pi;
+}
 
 #endif // !SPHERE_H
