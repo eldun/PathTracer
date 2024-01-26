@@ -4,6 +4,7 @@
 #include "RtWeekend.h"
 #include "Interval.h"
 #include "rtw_stb_image.h"
+#include "Perlin.h"
 
 class Texture {
     public:
@@ -77,6 +78,19 @@ class ImageTexture : public Texture {
 
     private:
         rtw_image image;
+};
+
+class NoiseTexture : public Texture {
+    public:
+        NoiseTexture() {}
+
+        Vec3 value(double u, double v, const Vec3& p) const override {
+            return Vec3(1,1,1) * perlin.getNoise(p);
+        }
+
+    private:
+        Perlin perlin;
+
 };
 
 #endif

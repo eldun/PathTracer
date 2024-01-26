@@ -288,9 +288,30 @@ void generateEarth() {
     cam.render(world);
 }
 
+void generateTwoPerlinSpheres() {
+    HittableList world;
+
+    auto perlinTexture = make_shared<NoiseTexture>();
+    world.add(make_shared<Sphere>(Vec3(0,-1000,0), 1000, make_shared<Lambertian>(perlinTexture)));
+    world.add(make_shared<Sphere>(Vec3(0,2,0), 2, make_shared<Lambertian>(perlinTexture)));
+
+    Camera cam;
+
+    cam.aspectRatio        = 16.0 / 9.0;
+    cam.samplesPerPixel    = 100;
+    cam.maxDepth           = 50;
+
+    cam.vFov               = 20;
+    cam.lookFrom           = Vec3(13,2,3);
+    cam.lookAt             = Vec3(0,0,0);
+    cam.upDirection        = Vec3(0,1,0);
+
+    cam.render(world);
+}
+
 int main() {
 
-    switch (6) {
+    switch (7) {
     case 0:
         generateCheckeredRandomScene();
         break;
@@ -319,6 +340,10 @@ int main() {
         generateEarth();
         break;
 
+    case 7:
+        generateTwoPerlinSpheres();
+        break;
+        
     default:
         generateCheckeredRandomScene();
         break;
