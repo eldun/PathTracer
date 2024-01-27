@@ -291,7 +291,7 @@ void generateEarth() {
 void generateTwoPerlinSpheres() {
     HittableList world;
 
-    auto perlinTexture = make_shared<NoiseTexture>();
+    auto perlinTexture = make_shared<NoiseTexture>(4);
     world.add(make_shared<Sphere>(Vec3(0,-1000,0), 1000, make_shared<Lambertian>(perlinTexture)));
     world.add(make_shared<Sphere>(Vec3(0,2,0), 2, make_shared<Lambertian>(perlinTexture)));
 
