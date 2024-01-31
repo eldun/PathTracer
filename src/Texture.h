@@ -87,7 +87,7 @@ class NoiseTexture : public Texture {
         NoiseTexture(double scale) : scale(scale) {}
 
         Vec3 value(double u, double v, const Vec3& p) const override {
-            return Vec3(1,1,1) * perlin.getNoise(scale * p);
+            return Vec3(1,1,1) * 0.5 * (1.0 + perlin.getNoise(scale * p));
         }
 
     private:
