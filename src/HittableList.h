@@ -4,7 +4,7 @@
 #include "RtWeekend.h"
 
 #include "BoundingBox.h"
-#include "hittable.h"
+#include "Hittable.h"
 
 #include <memory>
 #include <vector>
